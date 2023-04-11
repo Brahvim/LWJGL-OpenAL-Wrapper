@@ -115,7 +115,7 @@ public class AlCapture extends AlNativeResource {
 
 				for (int i = 0; i < p_samplesPerBuffer; i = ALC11.alcGetInteger(
 						this.id, ALC11.ALC_CAPTURE_SAMPLES)) {
-					System.out.printf("Captured `%d` samples.\n", i);
+					// System.out.printf("Captured `%d` samples.\n", i);
 				}
 
 				ALC11.alcCaptureSamples(this.id, SAMPLES_BUFFER, p_samplesPerBuffer);
