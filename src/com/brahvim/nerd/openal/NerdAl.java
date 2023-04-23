@@ -68,12 +68,18 @@ public class NerdAl {
 	public int getListenerInt(final long p_ctxId, final int p_alEnum) {
 		ALC11.alcMakeContextCurrent(p_ctxId);
 		this.checkAlcError();
+
+		if (this.context.hasDisposed)
+			return Integer.MIN_VALUE;
 		return AL11.alGetListeneri(p_alEnum);
 	}
 
 	public float getListenerFloat(final long p_ctxId, final int p_alEnum) {
 		ALC11.alcMakeContextCurrent(p_ctxId);
 		this.checkAlcError();
+
+		if (this.context.hasDisposed)
+			return -Float.MAX_VALUE;
 		return AL11.alGetListenerf(p_alEnum);
 	}
 
@@ -83,6 +89,9 @@ public class NerdAl {
 		final IntBuffer intBuffer = MemoryStack.stackMallocInt(p_vecSize);
 		ALC11.alcMakeContextCurrent(p_ctxId);
 		this.checkAlcError();
+
+		if (this.context.hasDisposed)
+			return null;
 		AL11.alGetListeneriv(p_alEnum, intBuffer);
 		MemoryStack.stackPop();
 
@@ -94,6 +103,9 @@ public class NerdAl {
 		final FloatBuffer floatBuffer = MemoryStack.stackMallocFloat(p_vecSize);
 		ALC11.alcMakeContextCurrent(p_ctxId);
 		this.checkAlcError();
+
+		if (this.context.hasDisposed)
+			return null;
 		AL11.alGetListenerfv(p_alEnum, floatBuffer);
 		MemoryStack.stackPop();
 
@@ -105,6 +117,9 @@ public class NerdAl {
 		final IntBuffer intBuffer = MemoryStack.stackMallocInt(3);
 		ALC11.alcMakeContextCurrent(p_ctxId);
 		this.checkAlcError();
+
+		if (this.context.hasDisposed)
+			return null;
 		AL11.alGetListeneriv(p_alEnum, intBuffer);
 		MemoryStack.stackPop();
 
@@ -116,6 +131,9 @@ public class NerdAl {
 		final FloatBuffer floatBuffer = MemoryStack.stackMallocFloat(3);
 		ALC11.alcMakeContextCurrent(p_ctxId);
 		this.checkAlcError();
+
+		if (this.context.hasDisposed)
+			return null;
 		AL11.alGetListenerfv(p_alEnum, floatBuffer);
 		MemoryStack.stackPop();
 
@@ -196,12 +214,18 @@ public class NerdAl {
 	public float getListenerMetersPerUnit() {
 		ALC11.alcMakeContextCurrent(this.DEFAULT_CONTEXT_ID);
 		this.checkAlcError();
+
+		if (this.context.hasDisposed)
+			return -Float.MAX_VALUE;
 		return AL11.alGetListenerf(EXTEfx.AL_METERS_PER_UNIT);
 	}
 
 	public float getListenerGain() {
 		ALC11.alcMakeContextCurrent(this.DEFAULT_CONTEXT_ID);
 		this.checkAlcError();
+
+		if (this.context.hasDisposed)
+			return -Float.MAX_VALUE;
 		return AL11.alGetListenerf(AL11.AL_GAIN);
 	}
 
@@ -210,6 +234,9 @@ public class NerdAl {
 		final FloatBuffer floatBuffer = MemoryStack.stackMallocFloat(3);
 		ALC11.alcMakeContextCurrent(this.DEFAULT_CONTEXT_ID);
 		this.checkAlcError();
+
+		if (this.context.hasDisposed)
+			return null;
 		AL11.alGetListenerfv(AL11.AL_POSITION, floatBuffer);
 		MemoryStack.stackPop();
 
@@ -222,6 +249,9 @@ public class NerdAl {
 		final FloatBuffer floatBuffer = MemoryStack.stackMallocFloat(3);
 		ALC11.alcMakeContextCurrent(this.DEFAULT_CONTEXT_ID);
 		this.checkAlcError();
+
+		if (this.context.hasDisposed)
+			return null;
 		AL11.alGetListenerfv(AL11.AL_VELOCITY, floatBuffer);
 		MemoryStack.stackPop();
 
@@ -234,6 +264,9 @@ public class NerdAl {
 		final FloatBuffer floatBuffer = MemoryStack.stackMallocFloat(3);
 		ALC11.alcMakeContextCurrent(this.DEFAULT_CONTEXT_ID);
 		this.checkAlcError();
+
+		if (this.context.hasDisposed)
+			return null;
 		AL11.alGetListenerfv(AL11.AL_ORIENTATION, floatBuffer);
 		MemoryStack.stackPop();
 

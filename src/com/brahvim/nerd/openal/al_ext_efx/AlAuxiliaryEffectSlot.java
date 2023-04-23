@@ -309,6 +309,9 @@ public class AlAuxiliaryEffectSlot extends AlNativeResource {
 		MemoryStack.stackPush();
 		final IntBuffer buffer = MemoryStack.stackMallocInt(1);
 
+		if (super.hasDisposed)
+			return Integer.MIN_VALUE;
+
 		EXTEfx.alGetAuxiliaryEffectSloti(this.id, p_alEnum, buffer);
 
 		MemoryStack.stackPop();
@@ -320,6 +323,9 @@ public class AlAuxiliaryEffectSlot extends AlNativeResource {
 	public int[] getIntVector(final int p_alEnum, final int p_vecSize) {
 		MemoryStack.stackPush();
 		final IntBuffer buffer = MemoryStack.stackMallocInt(p_vecSize);
+
+		if (super.hasDisposed)
+			return null;
 
 		EXTEfx.alGetAuxiliaryEffectSlotiv(this.id, p_alEnum, buffer);
 
@@ -333,6 +339,9 @@ public class AlAuxiliaryEffectSlot extends AlNativeResource {
 		MemoryStack.stackPush();
 		final FloatBuffer buffer = MemoryStack.stackMallocFloat(1);
 
+		if (super.hasDisposed)
+			return -Float.MAX_VALUE;
+
 		EXTEfx.alGetAuxiliaryEffectSlotf(this.id, p_alEnum, buffer);
 
 		MemoryStack.stackPop();
@@ -344,6 +353,9 @@ public class AlAuxiliaryEffectSlot extends AlNativeResource {
 	public float[] getFloatVector(final int p_alEnum, final int p_vecSize) {
 		MemoryStack.stackPush();
 		final FloatBuffer buffer = MemoryStack.stackMallocFloat(p_vecSize);
+
+		if (super.hasDisposed)
+			return null;
 
 		EXTEfx.alGetAuxiliaryEffectSlotfv(this.id, p_alEnum, buffer);
 

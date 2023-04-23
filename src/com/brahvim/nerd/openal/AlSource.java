@@ -134,12 +134,20 @@ public class AlSource extends AlNativeResource {
 	public int getInt(final int p_alEnum) {
 		ALC11.alcMakeContextCurrent(this.context.getId());
 		this.alMan.checkAlcError();
+
+		if (super.hasDisposed)
+			return Integer.MIN_VALUE;
+
 		return AL11.alGetSourcei(this.id, p_alEnum);
 	}
 
 	public float getFloat(final int p_alEnum) {
 		ALC11.alcMakeContextCurrent(this.context.getId());
 		this.alMan.checkAlcError();
+
+		if (super.hasDisposed)
+			return -Float.MAX_VALUE;
+
 		return AL11.alGetSourcef(this.id, p_alEnum);
 	}
 
@@ -149,6 +157,10 @@ public class AlSource extends AlNativeResource {
 		this.alMan.checkAlcError();
 		MemoryStack.stackPush();
 		final IntBuffer intBuffer = MemoryStack.stackMallocInt(p_vecSize);
+
+		if (super.hasDisposed)
+			return null;
+
 		AL11.alGetSourceiv(this.id, p_alEnum, intBuffer);
 		MemoryStack.stackPop();
 
@@ -162,6 +174,10 @@ public class AlSource extends AlNativeResource {
 		final FloatBuffer f1 = MemoryStack.stackMallocFloat(1),
 				f2 = MemoryStack.stackMallocFloat(1),
 				f3 = MemoryStack.stackMallocFloat(1);
+
+		if (super.hasDisposed)
+			return null;
+
 		AL11.alGetSource3f(this.id, p_alEnum, f1, f2, f3);
 		MemoryStack.stackPop();
 
@@ -173,6 +189,10 @@ public class AlSource extends AlNativeResource {
 		this.alMan.checkAlcError();
 		MemoryStack.stackPush();
 		final FloatBuffer floatBuffer = MemoryStack.stackMallocFloat(p_vecSize);
+
+		if (super.hasDisposed)
+			return null;
+
 		AL11.alGetSourcefv(this.id, p_alEnum, floatBuffer);
 		MemoryStack.stackPop();
 
@@ -184,6 +204,10 @@ public class AlSource extends AlNativeResource {
 		this.alMan.checkAlcError();
 		MemoryStack.stackPush();
 		final IntBuffer intBuffer = MemoryStack.stackMallocInt(3);
+
+		if (super.hasDisposed)
+			return null;
+
 		AL11.alGetSourceiv(this.id, p_alEnum, intBuffer);
 		MemoryStack.stackPop();
 

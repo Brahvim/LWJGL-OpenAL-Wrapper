@@ -104,10 +104,18 @@ public abstract class AlBuffer<BufferT extends Buffer> extends AlNativeResource 
 
 	// region C-style OpenAL getters.
 	public int getInt(final int p_alEnum) {
+
+		if (super.hasDisposed)
+			return Integer.MIN_VALUE;
+
 		return AL11.alGetBufferi(this.id, p_alEnum);
 	}
 
 	public float getFloat(final int p_alEnum) {
+
+		if (super.hasDisposed)
+			return -Float.MAX_VALUE;
+
 		return AL11.alGetBufferf(this.id, p_alEnum);
 	}
 
@@ -115,6 +123,10 @@ public abstract class AlBuffer<BufferT extends Buffer> extends AlNativeResource 
 	public int[] getIntVector(final int p_alEnum, final int p_vecSize) {
 		MemoryStack.stackPush();
 		final IntBuffer intBuffer = MemoryStack.stackMallocInt(p_vecSize);
+
+		if (super.hasDisposed)
+			return null;
+
 		AL11.alGetBufferiv(this.id, p_alEnum, intBuffer);
 		MemoryStack.stackPop();
 
@@ -124,6 +136,10 @@ public abstract class AlBuffer<BufferT extends Buffer> extends AlNativeResource 
 	public float[] getFloatVector(final int p_alEnum, final int p_vecSize) {
 		MemoryStack.stackPush();
 		final FloatBuffer floatBuffer = MemoryStack.stackMallocFloat(p_vecSize);
+
+		if (super.hasDisposed)
+			return null;
+
 		AL11.alGetBufferfv(this.id, p_alEnum, floatBuffer);
 		MemoryStack.stackPop();
 
@@ -133,6 +149,10 @@ public abstract class AlBuffer<BufferT extends Buffer> extends AlNativeResource 
 	public int[] getIntTriplet(final int p_alEnum) {
 		MemoryStack.stackPush();
 		final IntBuffer intBuffer = MemoryStack.stackMallocInt(3);
+
+		if (super.hasDisposed)
+			return null;
+
 		AL11.alGetBufferiv(this.id, p_alEnum, intBuffer);
 		MemoryStack.stackPop();
 
@@ -142,6 +162,10 @@ public abstract class AlBuffer<BufferT extends Buffer> extends AlNativeResource 
 	public /* `float[]` */ float[] getFloatTriplet(final int p_alEnum) {
 		MemoryStack.stackPush();
 		final FloatBuffer floatBuffer = MemoryStack.stackMallocFloat(3);
+
+		if (super.hasDisposed)
+			return null;
+
 		AL11.alGetBufferfv(this.id, p_alEnum, floatBuffer);
 		MemoryStack.stackPop();
 

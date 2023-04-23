@@ -46,6 +46,9 @@ public abstract class AlFilter extends AlNativeResource {
 		MemoryStack.stackPush();
 		final IntBuffer buffer = MemoryStack.stackMallocInt(1);
 
+		if (super.hasDisposed)
+			return -Integer.MIN_VALUE;
+
 		EXTEfx.alGetFilteri(this.id, p_alEnum, buffer);
 
 		MemoryStack.stackPop();
@@ -57,6 +60,9 @@ public abstract class AlFilter extends AlNativeResource {
 	public int[] getIntVector(final int p_alEnum, final int p_vecSize) {
 		MemoryStack.stackPush();
 		final IntBuffer buffer = MemoryStack.stackMallocInt(p_vecSize);
+
+		if (super.hasDisposed)
+			return null;
 
 		EXTEfx.alGetFilteriv(this.id, p_alEnum, buffer);
 
@@ -70,6 +76,9 @@ public abstract class AlFilter extends AlNativeResource {
 		MemoryStack.stackPush();
 		final FloatBuffer buffer = MemoryStack.stackMallocFloat(1);
 
+		if (super.hasDisposed)
+			return -Float.MAX_VALUE;
+
 		EXTEfx.alGetFilterf(this.id, p_alEnum, buffer);
 
 		MemoryStack.stackPop();
@@ -81,6 +90,9 @@ public abstract class AlFilter extends AlNativeResource {
 	public float[] getFloatVector(final int p_alEnum, final int p_vecSize) {
 		MemoryStack.stackPush();
 		final FloatBuffer buffer = MemoryStack.stackMallocFloat(p_vecSize);
+
+		if (super.hasDisposed)
+			return null;
 
 		EXTEfx.alGetFilterfv(this.id, p_alEnum, buffer);
 
