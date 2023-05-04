@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 import org.lwjgl.openal.AL11;
 
-import com.brahvim.nerd.openal.al_buffers.AlWavBuffer;
+import com.brahvim.nerd.openal.al_buffers.AlOggBuffer;
 
 public class AlDataStream {
 
@@ -15,7 +15,7 @@ public class AlDataStream {
 
 	private final NerdAl alMan;
 	private final AlSource source;
-	private final ArrayList<AlWavBuffer> buffers = new ArrayList<>(3),
+	private final ArrayList<AlOggBuffer> buffers = new ArrayList<>(3),
 			unusedBuffersPool = new ArrayList<>(5);
 	// endregion
 
@@ -28,11 +28,11 @@ public class AlDataStream {
 	public synchronized void addBytes(final int p_alFormat, final byte[] p_bytes, final int p_sampleRate) {
 		// This is fine - `ArrayList`s don't decrease their size anyway.
 		if (this.unusedBuffersPool.isEmpty())
-			this.unusedBuffersPool.add(new AlWavBuffer(this.alMan));
+			this.unusedBuffersPool.add(new AlOggBuffer(this.alMan));
 
-		final AlWavBuffer toQueue = this.unusedBuffersPool.remove(0);
+		final AlOggBuffer toQueue = this.unusedBuffersPool.remove(0);
 		toQueue.setData(p_alFormat, ByteBuffer.wrap(p_bytes)
-				.order(ByteOrder.nativeOrder()).asIntBuffer(),
+				.order(ByteOrder.nativeOrder()).asShortBuffer(),
 				p_sampleRate);
 		this.source.queueBuffers(toQueue);
 		this.alMan.checkAlError();
@@ -43,7 +43,7 @@ public class AlDataStream {
 	// ...you might wanna check out that loop in this method!:
 	/* `package` */ void framelyCallback() {
 		for (int i = this.source.getBuffersProcessed() - 1; i != 0; i--) {
-			final AlWavBuffer b = this.buffers.get(i);
+			final AlOggBuffer b = this.buffers.get(i);
 			this.source.unqueueBuffers(b);
 			this.alMan.checkAlError();
 			this.unusedBuffersPool.add(this.buffers.remove(i));
@@ -60,7 +60,7 @@ public class AlDataStream {
 		this.alMan.checkAlError();
 	}
 
-	public ArrayList<AlWavBuffer> getAlBuffers() {
+	public ArrayList<AlOggBuffer> getAlBuffers() {
 		return new ArrayList<>(this.buffers);
 	}
 

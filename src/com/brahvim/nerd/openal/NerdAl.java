@@ -16,7 +16,6 @@ import org.lwjgl.system.MemoryStack;
 
 import com.brahvim.nerd.openal.al_buffers.AlBuffer;
 import com.brahvim.nerd.openal.al_buffers.AlOggBuffer;
-import com.brahvim.nerd.openal.al_buffers.AlWavBuffer;
 import com.brahvim.nerd.openal.al_exceptions.AlException;
 import com.brahvim.nerd.openal.al_exceptions.AlcException;
 import com.brahvim.nerd.openal.al_exceptions.NerdAbstractOpenAlException;
@@ -486,7 +485,7 @@ public class NerdAl {
 
 	@Deprecated
 	public AlSource sourceFromWav(final File p_file) {
-		return new AlSource(this, new AlWavBuffer(this).loadFrom(p_file));
+		return new AlSource(this, new com.brahvim.nerd.openal.al_buffers.AlWavBuffer(this).loadFrom(p_file));
 	}
 
 	public AlSource sourceFromOgg(final String p_filePath) {
@@ -495,7 +494,7 @@ public class NerdAl {
 
 	@Deprecated
 	public AlSource sourceFromWav(final String p_filePath) {
-		return new AlSource(this, new AlWavBuffer(this).loadFrom(p_filePath));
+		return new AlSource(this, new com.brahvim.nerd.openal.al_buffers.AlWavBuffer(this).loadFrom(p_filePath));
 	}
 	// endregion
 

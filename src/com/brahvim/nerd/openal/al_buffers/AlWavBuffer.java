@@ -16,6 +16,7 @@ import org.lwjgl.openal.AL11;
 
 import com.brahvim.nerd.openal.NerdAl;
 
+@Deprecated
 public class AlWavBuffer extends AlBuffer<IntBuffer> {
 
 	// region Constructors.

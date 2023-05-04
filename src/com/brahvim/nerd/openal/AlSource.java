@@ -15,7 +15,6 @@ import com.brahvim.nerd.openal.al_buffers.AlBuffer;
 import com.brahvim.nerd.openal.al_buffers.AlBufferLoader;
 import com.brahvim.nerd.openal.al_buffers.AlNoTypeBuffer;
 import com.brahvim.nerd.openal.al_buffers.AlOggBuffer;
-import com.brahvim.nerd.openal.al_buffers.AlWavBuffer;
 import com.brahvim.nerd.openal.al_ext_efx.AlAuxiliaryEffectSlot;
 import com.brahvim.nerd.openal.al_ext_efx.al_filter.AlFilter;
 
@@ -104,7 +103,7 @@ public class AlSource extends AlNativeResource {
 	// endregion
 
 	// region ...literal "buffer distribution", :joy:
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "deprecation" })
 	public <T extends Buffer> AlBuffer<T> getBuffer() {
 		final int BUFFER_ID = this.getInt(AL11.AL_BUFFER);
 		if (BUFFER_ID == this.buffer.getId())
@@ -112,7 +111,7 @@ public class AlSource extends AlNativeResource {
 
 		if (this.buffer instanceof AlOggBuffer)
 			return (AlBuffer<T>) this.buffer;
-		else if (this.buffer instanceof AlWavBuffer)
+		else if (this.buffer instanceof com.brahvim.nerd.openal.al_buffers.AlWavBuffer)
 			return (AlBuffer<T>) this.buffer;
 		else
 			return (AlBuffer<T>) new AlNoTypeBuffer(this.alMan, BUFFER_ID);
