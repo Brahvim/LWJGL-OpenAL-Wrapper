@@ -109,18 +109,21 @@ public class AlCapture extends AlNativeResource {
 
 			// Capture till `stopCapturing()` is called:
 			while (!Thread.interrupted()) {
-				this.alMan.checkAlcError();
+				// Check for errors HERE to avoid blocking writes,
+				this.alMan.checkAlcError(); // ...and disallow bad writes!
 
-				final ByteBuffer SAMPLES_BUFFER = ByteBuffer.allocate(p_samplesPerBuffer);
+				final ByteBuffer samplesBuffer = ByteBuffer.allocate(p_samplesPerBuffer);
 
-				for (int i = 0; i < p_samplesPerBuffer; i = ALC11.alcGetInteger(
-						this.id, ALC11.ALC_CAPTURE_SAMPLES)) {
-					// System.out.printf("Captured `%d` samples.\n", i);
-				}
+				for (int i = 0; i < p_samplesPerBuffer; i = ALC11
+						.alcGetInteger(this.id, ALC11.ALC_CAPTURE_SAMPLES))
+					// { System.out.printf("Captured `%d` samples.\n", i)
+					; // }
 
-				ALC11.alcCaptureSamples(this.id, SAMPLES_BUFFER, p_samplesPerBuffer);
+				// ...Throws the exception :(
+				ALC11.alcCaptureSamples(this.id, samplesBuffer, p_samplesPerBuffer);
 
-				// region Check if the device gets disconnected (cause of `ALC_INVALID_DEVICE`):
+				// region Check if the device is disconnected (cause of `ALC_INVALID_DEVICE`!).
+				deviceGotRemoved = false;
 				try {
 					this.alMan.checkAlcError();
 				} catch (final AlcException e) {
@@ -131,12 +134,13 @@ public class AlCapture extends AlNativeResource {
 					this.captureThread.interrupt();
 				}
 				// endregion
+				// If it does, this thread will get interrupted, stopping the recording.
 
 				// Store the old data away:
 				final byte[] oldData = dataCaptured.array();
 				dataCaptured = ByteBuffer.allocate(oldData.length + p_samplesPerBuffer);
 				dataCaptured.put(oldData);
-				dataCaptured.put(SAMPLES_BUFFER);
+				dataCaptured.put(samplesBuffer);
 			}
 
 			// When interrupted, stop capturing:
@@ -211,7 +215,7 @@ public class AlCapture extends AlNativeResource {
 
 	@Override
 	protected void disposeImpl() {
-		ALC11.alcCaptureCloseDevice(this.id);
+		ALC11.alcCaptureCloseDevice(this.id); // No error checking needed?
 		AlCapture.ALL_INSTANCES.remove(this);
 	}
 

@@ -1,4 +1,4 @@
-package com.brahvim.nerd.openal.al_buffers;
+package com.brahvim.nerd.openal;
 
 import java.io.File;
 import java.nio.Buffer;
@@ -9,9 +9,6 @@ import java.util.ArrayList;
 import org.lwjgl.openal.AL11;
 import org.lwjgl.openal.ALC11;
 import org.lwjgl.system.MemoryStack;
-
-import com.brahvim.nerd.openal.AlNativeResource;
-import com.brahvim.nerd.openal.NerdAl;
 
 // If "`BufferT`" sounds weird to you, check out: 
 // https://stackoverflow.com/a/30146204/

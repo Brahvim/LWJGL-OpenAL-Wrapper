@@ -14,13 +14,10 @@ import org.lwjgl.openal.ALCapabilities;
 import org.lwjgl.openal.EXTEfx;
 import org.lwjgl.system.MemoryStack;
 
-import com.brahvim.nerd.openal.al_buffers.AlBuffer;
 import com.brahvim.nerd.openal.al_buffers.AlOggBuffer;
 import com.brahvim.nerd.openal.al_exceptions.AlException;
 import com.brahvim.nerd.openal.al_exceptions.AlcException;
 import com.brahvim.nerd.openal.al_exceptions.NerdAbstractOpenAlException;
-import com.brahvim.nerd.openal.al_ext_efx.AlAuxiliaryEffectSlot;
-import com.brahvim.nerd.openal.al_ext_efx.AlEffect;
 import com.brahvim.nerd.openal.al_ext_efx.al_filter.AlFilter;
 
 public class NerdAl {
@@ -429,10 +426,13 @@ public class NerdAl {
 	// endregion
 
 	// region Error, and other checks.
-	public static boolean isSource(final int p_id) {
-		return AL11.alIsSource(p_id);
+	public boolean isSource(final int p_id) {
+		final boolean toRet = AL11.alIsSource(p_id);
+		this.checkAlError();
+		return toRet;
 	}
 
+	// region The `static` guys.
 	public static boolean isBuffer(final int p_id) {
 		return AL11.alIsBuffer(p_id);
 	}
@@ -456,6 +456,7 @@ public class NerdAl {
 	public static int errorStringToCode(final NerdAbstractOpenAlException p_exception) {
 		return AL11.alGetEnumValue(p_exception.getAlcErrorString());
 	}
+	// endregion
 
 	public int checkAlError() throws AlException {
 		final int alError = AL11.alGetError();

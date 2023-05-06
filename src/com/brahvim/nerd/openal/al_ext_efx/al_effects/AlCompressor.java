@@ -3,8 +3,8 @@ package com.brahvim.nerd.openal.al_ext_efx.al_effects;
 import org.lwjgl.openal.AL11;
 import org.lwjgl.openal.EXTEfx;
 
+import com.brahvim.nerd.openal.AlEffect;
 import com.brahvim.nerd.openal.NerdAl;
-import com.brahvim.nerd.openal.al_ext_efx.AlEffect;
 
 public class AlCompressor extends AlEffect {
 

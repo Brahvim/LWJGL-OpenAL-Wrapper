@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import org.lwjgl.openal.ALC11;
 
-import com.brahvim.nerd.openal.al_buffers.AlBuffer;
 import com.brahvim.nerd.openal.al_exceptions.NerdAlException;
 
 public class AlContext extends AlNativeResource {
@@ -89,7 +88,7 @@ public class AlContext extends AlNativeResource {
 		}
 
 		final long toRet = ALC11.alcCreateContext(this.deviceId, p_settings.asAttribArray());
-		this.alMan.checkAlcError();
+		this.alMan.checkAlcError(); // We may just have too many contexts, apparently! (`ALC_INVALID_VALUE`)
 
 		// Placing the check into a boolean to check for errors right away!
 		final boolean ctxVerifStatus = ALC11.alcMakeContextCurrent(toRet);
@@ -107,13 +106,15 @@ public class AlContext extends AlNativeResource {
 		if (!ALC11.alcMakeContextCurrent(0))
 			throw new NerdAlException(
 					"Could not change the OpenAL context (whilst disposing one)!");
-
 		this.alMan.checkAlcError();
 
 		// *Actually* destroy the context object:
 		ALC11.alcDestroyContext(this.id);
-
-		this.alMan.checkAlcError();
+		// `disposeImpl()` will never be called again. We have a check for that in
+		// `AlNativeResource`. So - no need for this!:
+		// this.alMan.checkAlcError();
+		// (It checks for... *only* `ALC_INVALID_CONTEXT`! That's not gunna be possible,
+		// okay?!)
 		AlContext.ALL_INSTANCES.remove(this);
 	}
 

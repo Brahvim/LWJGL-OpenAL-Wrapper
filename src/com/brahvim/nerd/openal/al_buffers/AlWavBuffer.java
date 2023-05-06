@@ -14,6 +14,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 
 import org.lwjgl.openal.AL11;
 
+import com.brahvim.nerd.openal.AlBuffer;
 import com.brahvim.nerd.openal.NerdAl;
 
 @Deprecated
