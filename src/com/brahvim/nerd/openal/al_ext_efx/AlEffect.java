@@ -1,4 +1,4 @@
-package com.brahvim.nerd.openal;
+package com.brahvim.nerd.openal.al_ext_efx;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -6,6 +6,9 @@ import java.util.ArrayList;
 
 import org.lwjgl.openal.EXTEfx;
 import org.lwjgl.system.MemoryStack;
+
+import com.brahvim.nerd.openal.AlNativeResource;
+import com.brahvim.nerd.openal.NerdAl;
 
 public abstract class AlEffect extends AlNativeResource {
 

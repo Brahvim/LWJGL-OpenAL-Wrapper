@@ -115,11 +115,11 @@ public class AlDevice extends AlNativeResource {
 
 	@Override
 	protected void disposeImpl() {
-		if (!ALC11.alcCloseDevice(this.id)) // The device ID cannot be invalid, okay?!
+		if (!ALC11.alcCloseDevice(this.id))
 			throw new NerdAlException("Could not close OpenAL device!");
 
 		this.id = 0;
-		// this.alMan.checkAlcErrors(); // So, we won't need this!
+		// this.alMan.checkAlcErrors();
 		AlDevice.ALL_INSTANCES.remove(this);
 	}
 

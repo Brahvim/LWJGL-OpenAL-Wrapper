@@ -109,21 +109,18 @@ public class AlCapture extends AlNativeResource {
 
 			// Capture till `stopCapturing()` is called:
 			while (!Thread.interrupted()) {
-				// Check for errors HERE to avoid blocking writes,
-				this.alMan.checkAlcError(); // ...and disallow bad writes!
+				this.alMan.checkAlcError();
 
-				final ByteBuffer samplesBuffer = ByteBuffer.allocate(p_samplesPerBuffer);
+				final ByteBuffer SAMPLES_BUFFER = ByteBuffer.allocate(p_samplesPerBuffer);
 
-				for (int i = 0; i < p_samplesPerBuffer; i = ALC11
-						.alcGetInteger(this.id, ALC11.ALC_CAPTURE_SAMPLES))
-					// { System.out.printf("Captured `%d` samples.\n", i)
-					; // }
+				for (int i = 0; i < p_samplesPerBuffer; i = ALC11.alcGetInteger(
+						this.id, ALC11.ALC_CAPTURE_SAMPLES)) {
+					// System.out.printf("Captured `%d` samples.\n", i);
+				}
 
-				// ...Throws the exception :(
-				ALC11.alcCaptureSamples(this.id, samplesBuffer, p_samplesPerBuffer);
+				ALC11.alcCaptureSamples(this.id, SAMPLES_BUFFER, p_samplesPerBuffer);
 
-				// region Check if the device is disconnected (cause of `ALC_INVALID_DEVICE`!).
-				deviceGotRemoved = false;
+				// region Check if the device gets disconnected (cause of `ALC_INVALID_DEVICE`):
 				try {
 					this.alMan.checkAlcError();
 				} catch (final AlcException e) {
@@ -134,13 +131,12 @@ public class AlCapture extends AlNativeResource {
 					this.captureThread.interrupt();
 				}
 				// endregion
-				// If it does, this thread will get interrupted, stopping the recording.
 
 				// Store the old data away:
 				final byte[] oldData = dataCaptured.array();
 				dataCaptured = ByteBuffer.allocate(oldData.length + p_samplesPerBuffer);
 				dataCaptured.put(oldData);
-				dataCaptured.put(samplesBuffer);
+				dataCaptured.put(SAMPLES_BUFFER);
 			}
 
 			// When interrupted, stop capturing:
@@ -215,7 +211,7 @@ public class AlCapture extends AlNativeResource {
 
 	@Override
 	protected void disposeImpl() {
-		ALC11.alcCaptureCloseDevice(this.id); // No error checking needed?
+		ALC11.alcCaptureCloseDevice(this.id);
 		AlCapture.ALL_INSTANCES.remove(this);
 	}
 

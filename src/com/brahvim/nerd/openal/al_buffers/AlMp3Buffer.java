@@ -13,7 +13,6 @@ import javax.sound.sampled.AudioFormat;
 
 import org.lwjgl.openal.AL11;
 
-import com.brahvim.nerd.openal.AlBuffer;
 import com.brahvim.nerd.openal.NerdAl;
 
 import fr.delthas.javamp3.Mp3InputStream;

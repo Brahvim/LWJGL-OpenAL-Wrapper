@@ -11,9 +11,11 @@ import org.lwjgl.openal.ALC11;
 import org.lwjgl.openal.EXTEfx;
 import org.lwjgl.system.MemoryStack;
 
+import com.brahvim.nerd.openal.al_buffers.AlBuffer;
 import com.brahvim.nerd.openal.al_buffers.AlBufferLoader;
 import com.brahvim.nerd.openal.al_buffers.AlNoTypeBuffer;
 import com.brahvim.nerd.openal.al_buffers.AlOggBuffer;
+import com.brahvim.nerd.openal.al_ext_efx.AlAuxiliaryEffectSlot;
 import com.brahvim.nerd.openal.al_ext_efx.al_filter.AlFilter;
 
 public class AlSource extends AlNativeResource {
@@ -689,7 +691,6 @@ public class AlSource extends AlNativeResource {
 		ALC11.alcMakeContextCurrent(this.context.getId());
 		this.alMan.checkAlcError();
 		AL11.alSourceQueueBuffers(this.id, p_buffer.getId());
-		this.alMan.checkAlError();
 	}
 
 	public void queueBuffers(final AlBuffer<?>... p_buffers) {
@@ -697,14 +698,12 @@ public class AlSource extends AlNativeResource {
 		ALC11.alcMakeContextCurrent(this.context.getId());
 		this.alMan.checkAlcError();
 		AL11.alSourceQueueBuffers(this.id, buffers);
-		this.alMan.checkAlError();
 	}
 
 	public void unqueueBuffers(final AlBuffer<?> p_buffer) {
 		ALC11.alcMakeContextCurrent(this.context.getId());
 		this.alMan.checkAlcError();
 		AL11.alSourceUnqueueBuffers(this.id);
-		this.alMan.checkAlError();
 	}
 
 	public void unqueueBuffers(final AlBuffer<?>... p_buffers) {
@@ -712,7 +711,6 @@ public class AlSource extends AlNativeResource {
 		ALC11.alcMakeContextCurrent(this.context.getId());
 		this.alMan.checkAlcError();
 		AL11.alSourceUnqueueBuffers(this.id, buffers);
-		this.alMan.checkAlError();
 	}
 
 	@Override

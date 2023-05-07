@@ -1,4 +1,4 @@
-package com.brahvim.nerd.openal;
+package com.brahvim.nerd.openal.al_ext_efx;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -8,6 +8,9 @@ import org.lwjgl.openal.AL11;
 import org.lwjgl.openal.EXTEfx;
 import org.lwjgl.system.MemoryStack;
 
+import com.brahvim.nerd.openal.AlNativeResource;
+import com.brahvim.nerd.openal.AlSource;
+import com.brahvim.nerd.openal.NerdAl;
 import com.brahvim.nerd.openal.al_exceptions.NerdAlException;
 import com.brahvim.nerd.openal.al_ext_efx.al_effects.AlAutowah;
 import com.brahvim.nerd.openal.al_ext_efx.al_effects.AlChorus;
@@ -131,11 +134,11 @@ public class AlAuxiliaryEffectSlot extends AlNativeResource {
 	public <T extends AlEffect> T getEffect() {
 		final int ID = this.getInt(EXTEfx.AL_EFFECTSLOT_EFFECT);
 
-		if (ID == this.effect.getId())
+		if (ID == this.effect.id)
 			return (T) this.effect;
 		else
 			for (final AlEffect e : AlEffect.ALL_INSTANCES) {
-				if (e.getId() == ID)
+				if (e.id == ID)
 					return (T) e;
 			}
 
@@ -290,7 +293,7 @@ public class AlAuxiliaryEffectSlot extends AlNativeResource {
 
 		this.effect = p_effect;
 		this.effect.slot = this;
-		EXTEfx.alAuxiliaryEffectSloti(this.id, EXTEfx.AL_EFFECTSLOT_EFFECT, p_effect.getId());
+		EXTEfx.alAuxiliaryEffectSloti(this.id, EXTEfx.AL_EFFECTSLOT_EFFECT, p_effect.id);
 		return toRet;
 	}
 

@@ -11,7 +11,6 @@ import org.lwjgl.stb.STBVorbis;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.libc.LibCStdlib;
 
-import com.brahvim.nerd.openal.AlBuffer;
 import com.brahvim.nerd.openal.NerdAl;
 
 public class AlOggBuffer extends AlBuffer<ShortBuffer> {
