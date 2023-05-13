@@ -14,14 +14,10 @@ import org.lwjgl.openal.ALCapabilities;
 import org.lwjgl.openal.EXTEfx;
 import org.lwjgl.system.MemoryStack;
 
-import com.brahvim.nerd.openal.al_buffers.AlBuffer;
 import com.brahvim.nerd.openal.al_buffers.AlOggBuffer;
 import com.brahvim.nerd.openal.al_exceptions.AlException;
 import com.brahvim.nerd.openal.al_exceptions.AlcException;
 import com.brahvim.nerd.openal.al_exceptions.NerdAbstractOpenAlException;
-import com.brahvim.nerd.openal.al_ext_efx.AlAuxiliaryEffectSlot;
-import com.brahvim.nerd.openal.al_ext_efx.AlEffect;
-import com.brahvim.nerd.openal.al_ext_efx.al_filter.AlFilter;
 
 public class NerdAl {
 

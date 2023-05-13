@@ -11,12 +11,9 @@ import org.lwjgl.openal.ALC11;
 import org.lwjgl.openal.EXTEfx;
 import org.lwjgl.system.MemoryStack;
 
-import com.brahvim.nerd.openal.al_buffers.AlBuffer;
 import com.brahvim.nerd.openal.al_buffers.AlBufferLoader;
 import com.brahvim.nerd.openal.al_buffers.AlNoTypeBuffer;
 import com.brahvim.nerd.openal.al_buffers.AlOggBuffer;
-import com.brahvim.nerd.openal.al_ext_efx.AlAuxiliaryEffectSlot;
-import com.brahvim.nerd.openal.al_ext_efx.al_filter.AlFilter;
 
 public class AlSource extends AlNativeResource {
 
@@ -27,9 +24,16 @@ public class AlSource extends AlNativeResource {
 	private final NerdAl alMan;
 	private final AlContext context;
 
+	// State tracking!:
+	private boolean ppaused, paused;
+	private boolean pstopped, stopped;
+	private boolean pplaying, playing;
+	private boolean plooping, looping;
+
 	private AlBuffer<?> buffer;
 	private AlDataStream stream;
 	private AlAuxiliaryEffectSlot effectSlot;
+	private boolean disposeOnPlay, disposeBufferOnPlay;
 	private AlFilter directFilter, auxiliarySendFilter;
 	// endregion
 
@@ -366,22 +370,45 @@ public class AlSource extends AlNativeResource {
 	// endregion
 
 	// region State (`boolean`) getters.
-	// ..could be made faster with some `boolean`s in this class, y'know?
-	// ...just sayin'...
-	public boolean isLooping() {
-		return this.getInt(AL11.AL_SOURCE_STATE) == AL11.AL_LOOPING;
-	}
+	// These don't query their info directly from OpenAL since we already track
+	// that, might help prevent race conditions by making sure that the rate at
+	// which this data is updated/tracked is consistent!:
 
 	public boolean isPaused() {
-		return this.getInt(AL11.AL_SOURCE_STATE) == AL11.AL_PAUSED;
+		// return this.getInt(AL11.AL_SOURCE_STATE) == AL11.AL_PAUSED;
+		return this.paused;
+	}
+
+	public boolean isLooping() {
+		// return this.getInt(AL11.AL_SOURCE_STATE) == AL11.AL_LOOPING;
+		return this.looping;
 	}
 
 	public boolean isStopped() {
-		return this.getInt(AL11.AL_SOURCE_STATE) == AL11.AL_STOPPED;
+		// return this.getInt(AL11.AL_SOURCE_STATE) == AL11.AL_STOPPED;
+		return this.stopped;
 	}
 
 	public boolean isPlaying() {
-		return this.getInt(AL11.AL_SOURCE_STATE) == AL11.AL_PLAYING;
+		// return this.getInt(AL11.AL_SOURCE_STATE) == AL11.AL_PLAYING;
+		return this.playing;
+	}
+
+	// Previous frame tracking:
+	public boolean wasPaused() {
+		return this.ppaused;
+	}
+
+	public boolean wasLooping() {
+		return this.plooping;
+	}
+
+	public boolean wasStopped() {
+		return this.pstopped;
+	}
+
+	public boolean wasPlaying() {
+		return this.pplaying;
 	}
 	// endregion
 
@@ -651,6 +678,16 @@ public class AlSource extends AlNativeResource {
 		AL11.alSourcePlay(this.id);
 	}
 
+	public void playThenDispose() {
+		this.disposeOnPlay = true;
+		this.play();
+	}
+
+	public void playThenDisposeWithBuffer() {
+		this.disposeBufferOnPlay = true;
+		this.playThenDispose();
+	}
+
 	public void loop(final boolean p_value) {
 		this.setInt(AL11.AL_LOOPING, p_value ? AL11.AL_TRUE : AL11.AL_FALSE);
 	}
@@ -685,6 +722,23 @@ public class AlSource extends AlNativeResource {
 	/* `package` */ void framelyCallback() {
 		if (this.stream != null)
 			this.stream.framelyCallback();
+
+		this.ppaused = this.paused;
+		this.pplaying = this.playing;
+		this.pstopped = this.stopped;
+		this.plooping = this.looping;
+
+		this.paused = this.getSourceState() == AL11.AL_PAUSED;
+		this.playing = this.getSourceState() == AL11.AL_PLAYING;
+		this.stopped = this.getSourceState() == AL11.AL_STOPPED;
+		this.looping = this.getSourceState() == AL11.AL_LOOPING;
+
+		if (this.pplaying && !this.playing)
+			if (this.disposeOnPlay)
+				if (this.disposeBufferOnPlay)
+					this.disposeWithBuffer();
+				else
+					super.dispose();
 	}
 
 	public void queueBuffers(final AlBuffer<?> p_buffer) {
@@ -711,6 +765,11 @@ public class AlSource extends AlNativeResource {
 		ALC11.alcMakeContextCurrent(this.context.getId());
 		this.alMan.checkAlcError();
 		AL11.alSourceUnqueueBuffers(this.id, buffers);
+	}
+
+	public void disposeWithBuffer() {
+		super.dispose();
+		this.buffer.dispose();
 	}
 
 	@Override

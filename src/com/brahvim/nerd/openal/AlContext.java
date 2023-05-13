@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import org.lwjgl.openal.ALC11;
 
-import com.brahvim.nerd.openal.al_buffers.AlBuffer;
 import com.brahvim.nerd.openal.al_exceptions.NerdAlException;
 
 public class AlContext extends AlNativeResource {
