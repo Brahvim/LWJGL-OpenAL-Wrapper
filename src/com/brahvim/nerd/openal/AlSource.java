@@ -115,6 +115,8 @@ public class AlSource extends AlNativeResource {
 			return (AlBuffer<T>) this.buffer;
 		else if (this.buffer instanceof com.brahvim.nerd.openal.al_buffers.AlWavBuffer)
 			return (AlBuffer<T>) this.buffer;
+		else if (this.buffer instanceof com.brahvim.nerd.openal.al_buffers.AlMp3Buffer)
+			return (AlBuffer<T>) this.buffer;
 		else
 			return (AlBuffer<T>) new AlNoTypeBuffer(this.alMan, BUFFER_ID);
 	}
