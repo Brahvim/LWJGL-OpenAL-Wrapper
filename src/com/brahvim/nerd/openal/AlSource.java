@@ -1,6 +1,5 @@
 package com.brahvim.nerd.openal;
 
-import java.io.File;
 import java.nio.Buffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -12,10 +11,8 @@ import org.lwjgl.openal.ALC10;
 import org.lwjgl.openal.EXTEfx;
 import org.lwjgl.system.MemoryStack;
 
-import com.brahvim.nerd.openal.al_buffers.AlMp3Buffer;
 import com.brahvim.nerd.openal.al_buffers.AlNoTypeBuffer;
 import com.brahvim.nerd.openal.al_buffers.AlOggBuffer;
-import com.brahvim.nerd.openal.al_buffers.AlWavBuffer;
 
 public class AlSource extends AlNativeResource {
 
@@ -44,9 +41,8 @@ public class AlSource extends AlNativeResource {
 		this.alMan = p_alMan;
 		this.context = this.alMan.getContext();
 		ALC10.alcMakeContextCurrent(this.context.getId());
+		this.alMan.checkAlcError();
 
-		this.alMan.checkAlcError();
-		this.alMan.checkAlcError();
 		this.id = AL10.alGenSources();
 		this.alMan.checkAlError();
 
@@ -127,26 +123,6 @@ public class AlSource extends AlNativeResource {
 		this.buffer = p_buffer;
 		this.setInt(AL10.AL_BUFFER, this.buffer.getId());
 		return this;
-	}
-
-	public void loadOggBuffer(final File p_file) {
-		this.buffer = new AlOggBuffer(this.alMan).loadFrom(p_file);
-	}
-
-	/**
-	 * @deprecated since it uses a deprecated API.
-	 */
-	@Deprecated
-	public void loadWavBuffer(final File p_file) {
-		this.buffer = new AlWavBuffer(this.alMan).loadFrom(p_file);
-	}
-
-	/**
-	 * @deprecated since it uses a deprecated API.
-	 */
-	@Deprecated
-	public void loadMp3Buffer(final File p_file) {
-		this.buffer = new AlMp3Buffer(this.alMan).loadFrom(p_file);
 	}
 	// endregion
 

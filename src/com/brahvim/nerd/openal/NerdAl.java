@@ -515,18 +515,16 @@ public class NerdAl {
 
 	@SuppressWarnings("deprecation")
 	public void scenelyDisposal() {
-		ArrayList<? extends AlNativeResource> list = null;
-
 		for (int listId = 0; listId != 6; listId++) {
-			switch (listId) {
-				// Yes, I know some of these can reference the `protected` `ArrayList` directly.
-				case 0 -> list = AlCapture.getAllInstances();
-				case 1 -> list = AlFilter.getAllInstances();
-				case 2 -> list = AlEffect.getAllInstances();
-				case 3 -> list = AlAuxiliaryEffectSlot.getAllInstances(); // Always after the other two!
-				case 4 -> list = AlSource.getAllInstances(); // Before the buffers!
-				case 5 -> list = AlBuffer.getAllInstances(); // ...After the sources.
-			}
+			final ArrayList<? extends AlNativeResource> list = switch (listId) {
+				case 0 -> AlCapture.ALL_INSTANCES;
+				case 1 -> AlFilter.ALL_INSTANCES;
+				case 2 -> AlEffect.ALL_INSTANCES;
+				case 3 -> AlAuxiliaryEffectSlot.ALL_INSTANCES; // Always after the other two!
+				case 4 -> AlSource.ALL_INSTANCES; // Before the buffers!
+				case 5 -> AlBuffer.ALL_INSTANCES; // ...After the sources.
+				default -> null;
+			};
 
 			if (list == null)
 				continue;
@@ -541,8 +539,6 @@ public class NerdAl {
 
 		for (int listId = 0; listId < 8; listId++) {
 			final ArrayList<? extends AlNativeResource> list = switch (listId) {
-				// Yes, I know some of these can reference the `protected` `ArrayList` directly.
-				// Is this an extremely heavy resource?:
 				case 0 -> AlCapture.ALL_INSTANCES;
 				case 1 -> AlFilter.ALL_INSTANCES;
 				case 2 -> AlEffect.ALL_INSTANCES;
