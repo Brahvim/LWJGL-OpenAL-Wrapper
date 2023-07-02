@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
+import org.lwjgl.openal.ALC10;
 import org.lwjgl.openal.ALC11;
 import org.lwjgl.openal.ALUtil;
 import org.lwjgl.openal.EXTDisconnect;
@@ -22,7 +23,7 @@ public class AlDevice extends AlNativeResource {
 	private long id;
 	private String name;
 	private final NerdAl alMan;
-	private Supplier<String> disconnectionCallback = () -> AlDevice.getDefaultDeviceName();
+	private Supplier<String> disconnectionCallback = AlDevice::getDefaultDeviceName;
 	// endregion
 
 	// region Constructors.
@@ -35,10 +36,10 @@ public class AlDevice extends AlNativeResource {
 
 		this.alMan = p_manager;
 		this.name = p_deviceName;
-		this.id = ALC11.alcOpenDevice(this.name);
+		this.id = ALC10.alcOpenDevice(this.name);
 
-		// Check for errors:
-		final int alcError = ALC11.alcGetError(this.id);
+		// Check for errors:ALC10
+		final int alcError = ALC10.alcGetError(this.id);
 		if (alcError != 0)
 			throw new AlcException(this.id, alcError);
 	}
@@ -56,7 +57,7 @@ public class AlDevice extends AlNativeResource {
 	// endregion
 
 	public static String getDefaultDeviceName() {
-		return ALC11.alcGetString(0, ALC11.ALC_DEFAULT_DEVICE_SPECIFIER);
+		return ALC10.alcGetString(0, ALC10.ALC_DEFAULT_DEVICE_SPECIFIER);
 	}
 
 	public static List<String> getDevices() {
@@ -87,7 +88,7 @@ public class AlDevice extends AlNativeResource {
 		// No idea why this bad stack read works.
 		MemoryStack.stackPush();
 		final IntBuffer buffer = MemoryStack.stackMallocInt(1); // Stack allocation, "should" be "faster".
-		ALC11.alcGetIntegerv(this.id, EXTDisconnect.ALC_CONNECTED, buffer);
+		ALC10.alcGetIntegerv(this.id, EXTDisconnect.ALC_CONNECTED, buffer);
 		MemoryStack.stackPop();
 
 		return buffer.get() == 1;
@@ -115,7 +116,7 @@ public class AlDevice extends AlNativeResource {
 
 	@Override
 	protected void disposeImpl() {
-		if (!ALC11.alcCloseDevice(this.id))
+		if (!ALC10.alcCloseDevice(this.id))
 			throw new NerdAlException("Could not close OpenAL device!");
 
 		this.id = 0;

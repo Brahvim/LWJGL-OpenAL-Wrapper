@@ -6,9 +6,10 @@ import java.nio.IntBuffer;
 import java.util.ArrayList;
 
 import org.lwjgl.openal.AL;
+import org.lwjgl.openal.AL10;
 import org.lwjgl.openal.AL11;
 import org.lwjgl.openal.ALC;
-import org.lwjgl.openal.ALC11;
+import org.lwjgl.openal.ALC10;
 import org.lwjgl.openal.ALCCapabilities;
 import org.lwjgl.openal.ALCapabilities;
 import org.lwjgl.openal.EXTEfx;
@@ -43,7 +44,7 @@ public class NerdAl {
 	}
 
 	public NerdAl(final String p_deviceName) {
-		this.DEFAULT_CONTEXT = this.createAl(AlDevice.getDefaultDeviceName());
+		this.DEFAULT_CONTEXT = this.createAl(p_deviceName);
 		this.DEFAULT_CONTEXT_ID = this.DEFAULT_CONTEXT.getId();
 	}
 
@@ -53,7 +54,7 @@ public class NerdAl {
 	}
 
 	public NerdAl(final AlContext.AlContextSettings p_settings, final String p_deviceName) {
-		this.DEFAULT_CONTEXT = this.createAl(AlDevice.getDefaultDeviceName(), p_settings);
+		this.DEFAULT_CONTEXT = this.createAl(p_deviceName, p_settings);
 		this.DEFAULT_CONTEXT_ID = this.DEFAULT_CONTEXT.getId();
 	}
 	// endregion
@@ -61,32 +62,32 @@ public class NerdAl {
 	// region Listener functions.
 	// region C-style OpenAL listener getters.
 	public int getListenerInt(final long p_ctxId, final int p_alEnum) {
-		ALC11.alcMakeContextCurrent(p_ctxId);
+		ALC10.alcMakeContextCurrent(p_ctxId);
 		this.checkAlcError();
 
 		if (this.context.hasDisposed)
 			return Integer.MIN_VALUE;
-		return AL11.alGetListeneri(p_alEnum);
+		return AL10.alGetListeneri(p_alEnum);
 	}
 
 	public float getListenerFloat(final long p_ctxId, final int p_alEnum) {
-		ALC11.alcMakeContextCurrent(p_ctxId);
+		ALC10.alcMakeContextCurrent(p_ctxId);
 		this.checkAlcError();
 
 		if (this.context.hasDisposed)
 			return -Float.MAX_VALUE;
-		return AL11.alGetListenerf(p_alEnum);
+		return AL10.alGetListenerf(p_alEnum);
 	}
 
 	// Vectors in OpenAL are not large and can be allocated on the stack just fine.
 	public int[] getListenerIntVector(final long p_ctxId, final int p_alEnum, final int p_vecSize) {
 		MemoryStack.stackPush();
 		final IntBuffer intBuffer = MemoryStack.stackMallocInt(p_vecSize);
-		ALC11.alcMakeContextCurrent(p_ctxId);
+		ALC10.alcMakeContextCurrent(p_ctxId);
 		this.checkAlcError();
 
 		if (this.context.hasDisposed)
-			return null;
+			return new int[0];
 		AL11.alGetListeneriv(p_alEnum, intBuffer);
 		MemoryStack.stackPop();
 
@@ -96,12 +97,12 @@ public class NerdAl {
 	public float[] getListenerFloatVector(final long p_ctxId, final int p_alEnum, final int p_vecSize) {
 		MemoryStack.stackPush();
 		final FloatBuffer floatBuffer = MemoryStack.stackMallocFloat(p_vecSize);
-		ALC11.alcMakeContextCurrent(p_ctxId);
+		ALC10.alcMakeContextCurrent(p_ctxId);
 		this.checkAlcError();
 
 		if (this.context.hasDisposed)
-			return null;
-		AL11.alGetListenerfv(p_alEnum, floatBuffer);
+			return new float[0];
+		AL10.alGetListenerfv(p_alEnum, floatBuffer);
 		MemoryStack.stackPop();
 
 		return floatBuffer.array();
@@ -110,11 +111,11 @@ public class NerdAl {
 	public int[] getListenerIntTriplet(final long p_ctxId, final int p_alEnum) {
 		MemoryStack.stackPush();
 		final IntBuffer intBuffer = MemoryStack.stackMallocInt(3);
-		ALC11.alcMakeContextCurrent(p_ctxId);
+		ALC10.alcMakeContextCurrent(p_ctxId);
 		this.checkAlcError();
 
 		if (this.context.hasDisposed)
-			return null;
+			return new int[0];
 		AL11.alGetListeneriv(p_alEnum, intBuffer);
 		MemoryStack.stackPop();
 
@@ -124,12 +125,12 @@ public class NerdAl {
 	public /* `float[]` */ float[] getListenerFloatTriplet(final long p_ctxId, final int p_alEnum) {
 		MemoryStack.stackPush();
 		final FloatBuffer floatBuffer = MemoryStack.stackMallocFloat(3);
-		ALC11.alcMakeContextCurrent(p_ctxId);
+		ALC10.alcMakeContextCurrent(p_ctxId);
 		this.checkAlcError();
 
 		if (this.context.hasDisposed)
-			return null;
-		AL11.alGetListenerfv(p_alEnum, floatBuffer);
+			return new float[0];
+		AL10.alGetListenerfv(p_alEnum, floatBuffer);
 		MemoryStack.stackPop();
 
 		return floatBuffer.array();
@@ -139,30 +140,30 @@ public class NerdAl {
 
 	// region C-style OpenAL listener setters.
 	public void setListenerInt(final long p_ctxId, final int p_alEnum, final int p_value) {
-		ALC11.alcMakeContextCurrent(p_ctxId);
+		ALC10.alcMakeContextCurrent(p_ctxId);
 		this.checkAlcError();
-		AL11.alListeneri(p_alEnum, p_value);
+		AL10.alListeneri(p_alEnum, p_value);
 		this.checkAlError();
 	}
 
 	public void setListenerFloat(final long p_ctxId, final int p_alEnum, final float p_value) {
-		ALC11.alcMakeContextCurrent(p_ctxId);
+		ALC10.alcMakeContextCurrent(p_ctxId);
 		this.checkAlcError();
-		AL11.alListenerf(p_alEnum, p_value);
+		AL10.alListenerf(p_alEnum, p_value);
 		this.checkAlError();
 	}
 
 	public void setListenerIntVector(final long p_ctxId, final int p_alEnum, final int... p_value) {
-		ALC11.alcMakeContextCurrent(p_ctxId);
+		ALC10.alcMakeContextCurrent(p_ctxId);
 		this.checkAlcError();
 		AL11.alListeneriv(p_alEnum, p_value);
 		this.checkAlError();
 	}
 
 	public void setListenerFloatVector(final long p_ctxId, final int p_alEnum, final float... p_values) {
-		ALC11.alcMakeContextCurrent(p_ctxId);
+		ALC10.alcMakeContextCurrent(p_ctxId);
 		this.checkAlcError();
-		AL11.alListenerfv(p_alEnum, p_values);
+		AL10.alListenerfv(p_alEnum, p_values);
 		this.checkAlError();
 	}
 
@@ -171,7 +172,7 @@ public class NerdAl {
 			throw new IllegalArgumentException(
 					"`AlSource::setIntTriplet(AlContext p_ctx, )` cannot take an array of size other than `3`!");
 
-		ALC11.alcMakeContextCurrent(p_ctxId);
+		ALC10.alcMakeContextCurrent(p_ctxId);
 		this.checkAlcError();
 		AL11.alListener3i(p_alEnum, p_value[0], p_value[1], p_value[2]);
 		this.checkAlError();
@@ -179,7 +180,7 @@ public class NerdAl {
 
 	public void setListenerIntTriplet(final long p_ctxId, final int p_alEnum, final int p_i1, final int p_i2,
 			final int p_i3) {
-		ALC11.alcMakeContextCurrent(p_ctxId);
+		ALC10.alcMakeContextCurrent(p_ctxId);
 		this.checkAlcError();
 		AL11.alListener3i(p_alEnum, p_i1, p_i2, p_i3);
 		this.checkAlError();
@@ -188,51 +189,51 @@ public class NerdAl {
 	public void setListenerFloatTriplet(final long p_ctxId, final int p_alEnum, final float... p_value) {
 		if (p_value.length != 3)
 			throw new IllegalArgumentException(
-					"`AlSource::setFloatTriplet(AlContext p_ctx, )` cannot take an array of size other than `3`!");
+					"`AlSource::setFloatTriplet()` cannot take an array of a size other than `3`!");
 
-		ALC11.alcMakeContextCurrent(p_ctxId);
+		ALC10.alcMakeContextCurrent(p_ctxId);
 		this.checkAlcError();
-		AL11.alListener3f(p_alEnum, p_value[0], p_value[1], p_value[2]);
+		AL10.alListener3f(p_alEnum, p_value[0], p_value[1], p_value[2]);
 		this.checkAlError();
 	}
 
 	public void setListenerFloatTriplet(final long p_ctxId, final int p_alEnum, final float p_f1, final float p_f2,
 			final float p_f3) {
-		ALC11.alcMakeContextCurrent(p_ctxId);
+		ALC10.alcMakeContextCurrent(p_ctxId);
 		this.checkAlcError();
-		AL11.alListener3f(p_alEnum, p_f1, p_f2, p_f3);
+		AL10.alListener3f(p_alEnum, p_f1, p_f2, p_f3);
 		this.checkAlError();
 	}
 	// endregion
 
 	// region Default listener getters.
 	public float getListenerMetersPerUnit() {
-		ALC11.alcMakeContextCurrent(this.DEFAULT_CONTEXT_ID);
+		ALC10.alcMakeContextCurrent(this.DEFAULT_CONTEXT_ID);
 		this.checkAlcError();
 
 		if (this.context.hasDisposed)
 			return -Float.MAX_VALUE;
-		return AL11.alGetListenerf(EXTEfx.AL_METERS_PER_UNIT);
+		return AL10.alGetListenerf(EXTEfx.AL_METERS_PER_UNIT);
 	}
 
 	public float getListenerGain() {
-		ALC11.alcMakeContextCurrent(this.DEFAULT_CONTEXT_ID);
+		ALC10.alcMakeContextCurrent(this.DEFAULT_CONTEXT_ID);
 		this.checkAlcError();
 
 		if (this.context.hasDisposed)
 			return -Float.MAX_VALUE;
-		return AL11.alGetListenerf(AL11.AL_GAIN);
+		return AL10.alGetListenerf(AL10.AL_GAIN);
 	}
 
 	public float[] getListenerPosition() {
 		MemoryStack.stackPush();
 		final FloatBuffer floatBuffer = MemoryStack.stackMallocFloat(3);
-		ALC11.alcMakeContextCurrent(this.DEFAULT_CONTEXT_ID);
+		ALC10.alcMakeContextCurrent(this.DEFAULT_CONTEXT_ID);
 		this.checkAlcError();
 
 		if (this.context.hasDisposed)
-			return null;
-		AL11.alGetListenerfv(AL11.AL_POSITION, floatBuffer);
+			return new float[0];
+		AL10.alGetListenerfv(AL10.AL_POSITION, floatBuffer);
 		MemoryStack.stackPop();
 
 		return floatBuffer.array();
@@ -242,12 +243,12 @@ public class NerdAl {
 	public float[] getListenerVelocity() {
 		MemoryStack.stackPush();
 		final FloatBuffer floatBuffer = MemoryStack.stackMallocFloat(3);
-		ALC11.alcMakeContextCurrent(this.DEFAULT_CONTEXT_ID);
+		ALC10.alcMakeContextCurrent(this.DEFAULT_CONTEXT_ID);
 		this.checkAlcError();
 
 		if (this.context.hasDisposed)
-			return null;
-		AL11.alGetListenerfv(AL11.AL_VELOCITY, floatBuffer);
+			return new float[0];
+		AL10.alGetListenerfv(AL10.AL_VELOCITY, floatBuffer);
 		MemoryStack.stackPop();
 
 		return floatBuffer.array();
@@ -257,12 +258,12 @@ public class NerdAl {
 	public float[] getListenerOrientation() {
 		MemoryStack.stackPush();
 		final FloatBuffer floatBuffer = MemoryStack.stackMallocFloat(3);
-		ALC11.alcMakeContextCurrent(this.DEFAULT_CONTEXT_ID);
+		ALC10.alcMakeContextCurrent(this.DEFAULT_CONTEXT_ID);
 		this.checkAlcError();
 
 		if (this.context.hasDisposed)
-			return null;
-		AL11.alGetListenerfv(AL11.AL_ORIENTATION, floatBuffer);
+			return new float[0];
+		AL10.alGetListenerfv(AL10.AL_ORIENTATION, floatBuffer);
 		MemoryStack.stackPop();
 
 		return floatBuffer.array();
@@ -272,16 +273,16 @@ public class NerdAl {
 
 	// region Default listener setters.
 	public void setListenerGain(final float p_value) {
-		ALC11.alcMakeContextCurrent(this.DEFAULT_CONTEXT_ID);
+		ALC10.alcMakeContextCurrent(this.DEFAULT_CONTEXT_ID);
 		this.checkAlcError();
-		AL11.alListenerf(AL11.AL_GAIN, p_value);
+		AL10.alListenerf(AL10.AL_GAIN, p_value);
 		this.checkAlError();
 	}
 
 	public void setMetersPerUnit(final float p_value) {
-		ALC11.alcMakeContextCurrent(this.DEFAULT_CONTEXT_ID);
+		ALC10.alcMakeContextCurrent(this.DEFAULT_CONTEXT_ID);
 		this.checkAlcError();
-		AL11.alListenerf(EXTEfx.AL_METERS_PER_UNIT, p_value);
+		AL10.alListenerf(EXTEfx.AL_METERS_PER_UNIT, p_value);
 		this.checkAlError();
 	}
 
@@ -289,26 +290,30 @@ public class NerdAl {
 	public void setListenerPosition(final float... p_values) {
 		if (p_values.length != 3)
 			throw new IllegalArgumentException(
-					"`AlSource::setFloatTriplet(AlContext p_ctx, )` cannot take an array of size other than `3`!");
+					"`AlSource::setListenerPosition()` cannot take an array of a size other than `3`!");
 
-		ALC11.alcMakeContextCurrent(this.DEFAULT_CONTEXT_ID);
+		ALC10.alcMakeContextCurrent(this.DEFAULT_CONTEXT_ID);
 		this.checkAlcError();
-		AL11.alListener3f(AL11.AL_POSITION, p_values[0], p_values[1], p_values[2]);
+		AL10.alListener3f(AL10.AL_POSITION, p_values[0], p_values[1], p_values[2]);
 		this.checkAlError();
 	}
 
 	public void setListenerVelocity(final float... p_values) {
 		if (p_values.length != 3)
 			throw new IllegalArgumentException(
-					"`AlSource::setFloatTriplet(AlContext p_ctx, )` cannot take an array of size other than `3`!");
+					"`AlSource::setListenerVelocity()` cannot take an array of a size other than `3`!");
 
-		ALC11.alcMakeContextCurrent(this.DEFAULT_CONTEXT_ID);
+		ALC10.alcMakeContextCurrent(this.DEFAULT_CONTEXT_ID);
 		this.checkAlcError();
-		AL11.alListener3f(AL11.AL_VELOCITY, p_values[0], p_values[1], p_values[2]);
+		AL10.alListener3f(AL10.AL_VELOCITY, p_values[0], p_values[1], p_values[2]);
 		this.checkAlError();
 	}
 
 	public void setListenerOrientation(final float... p_values) {
+		if (p_values.length != 3)
+			throw new IllegalArgumentException(
+					"`AlSource::setListenerOrientation()` cannot take an array of a size other than `3`!");
+
 		final float[] values = new float[3];
 
 		// The usual case is for `y` to be `1`, and the rest to be `0`.
@@ -318,7 +323,7 @@ public class NerdAl {
 		values[2] = p_values[2] == 0.0f ? 0.0f : p_values[2] > 0.0f ? 1.0f : -1.0f;
 
 		try { // Need to put this in a try-catch block...
-			this.setListenerFloatVector(this.DEFAULT_CONTEXT_ID, AL11.AL_ORIENTATION, values);
+			this.setListenerFloatVector(this.DEFAULT_CONTEXT_ID, AL10.AL_ORIENTATION, values);
 		} catch (final AlException e) { // TOO MANY FALSE POSITIVES!
 			// System.out.printf("""
 			// Setting the listener's orientation to `%s` failed!
@@ -332,13 +337,13 @@ public class NerdAl {
 	// region Getters and setters!...
 	// region C-style OpenAL getters.
 	public int getAlInt(final int p_alEnum) {
-		final int toRet = AL11.alGetInteger(p_alEnum);
+		final int toRet = AL10.alGetInteger(p_alEnum);
 		this.checkAlError();
 		return toRet;
 	}
 
 	public float getAlFloat(final int p_alEnum) {
-		final float toRet = AL11.alGetFloat(p_alEnum);
+		final float toRet = AL10.alGetFloat(p_alEnum);
 		this.checkAlError();
 		return toRet;
 	}
@@ -346,7 +351,7 @@ public class NerdAl {
 	public int[] getAlIntVector(final int p_alEnum, final int p_vecSize) {
 		MemoryStack.stackPush();
 		final IntBuffer buffer = MemoryStack.stackMallocInt(p_vecSize);
-		AL11.alGetIntegerv(p_alEnum, buffer);
+		AL10.alGetIntegerv(p_alEnum, buffer);
 		MemoryStack.stackPop();
 
 		this.checkAlError();
@@ -356,7 +361,7 @@ public class NerdAl {
 	public float[] getAlFloatVector(final int p_alEnum, final int p_vecSize) {
 		MemoryStack.stackPush();
 		final FloatBuffer buffer = MemoryStack.stackMallocFloat(p_vecSize);
-		AL11.alGetFloatv(p_alEnum, buffer);
+		AL10.alGetFloatv(p_alEnum, buffer);
 		MemoryStack.stackPop();
 
 		this.checkAlError();
@@ -367,11 +372,11 @@ public class NerdAl {
 	// region Getters.
 	// region OpenAL API getters.
 	public float getDistanceModel() {
-		return this.getAlFloat(AL11.AL_DISTANCE_MODEL);
+		return this.getAlFloat(AL10.AL_DISTANCE_MODEL);
 	}
 
 	public float getDopplerFactor() {
-		return this.getAlFloat(AL11.AL_DOPPLER_FACTOR);
+		return this.getAlFloat(AL10.AL_DOPPLER_FACTOR);
 	}
 
 	public float getSpeedOfSound() {
@@ -411,11 +416,11 @@ public class NerdAl {
 	// Only these three setters.
 	// region OpenAL API setters.
 	public void setDistanceModel(final int p_value) {
-		AL11.alDistanceModel(p_value);
+		AL10.alDistanceModel(p_value);
 	}
 
 	public void setDopplerFactor(final float p_value) {
-		AL11.alDopplerFactor(p_value);
+		AL10.alDopplerFactor(p_value);
 	}
 
 	public void setSpeedOfSound(final float p_value) {
@@ -426,11 +431,11 @@ public class NerdAl {
 
 	// region Error, and other checks.
 	public static boolean isSource(final int p_id) {
-		return AL11.alIsSource(p_id);
+		return AL10.alIsSource(p_id);
 	}
 
 	public static boolean isBuffer(final int p_id) {
-		return AL11.alIsBuffer(p_id);
+		return AL10.alIsBuffer(p_id);
 	}
 
 	public static boolean isEffect(final int p_id) {
@@ -446,15 +451,15 @@ public class NerdAl {
 	}
 
 	public static int errorStringToCode(final String p_errorString) {
-		return AL11.alGetEnumValue(p_errorString.split("\"")[1]);
+		return AL10.alGetEnumValue(p_errorString.split("\"")[1]);
 	}
 
 	public static int errorStringToCode(final NerdAbstractOpenAlException p_exception) {
-		return AL11.alGetEnumValue(p_exception.getAlcErrorString());
+		return AL10.alGetEnumValue(p_exception.getAlcErrorString());
 	}
 
 	public int checkAlError() throws AlException {
-		final int alError = AL11.alGetError();
+		final int alError = AL10.alGetError();
 
 		// `40964` is THE MOST annoying error.
 		// Its error string is literally "No Error"!
@@ -465,7 +470,7 @@ public class NerdAl {
 	}
 
 	public int checkAlcError() throws AlcException {
-		final int alcError = ALC11.alcGetError(this.device.getId());
+		final int alcError = ALC10.alcGetError(this.device.getId());
 
 		if (alcError != 0)
 			throw new AlcException(this.getDeviceId(), alcError);
@@ -479,6 +484,9 @@ public class NerdAl {
 		return new AlSource(this, new AlOggBuffer(this).loadFrom(p_file));
 	}
 
+	/**
+	 * @deprecated We don't support WAV files for now.
+	 */
 	@Deprecated
 	public AlSource sourceFromWav(final File p_file) {
 		return new AlSource(this, new com.brahvim.nerd.openal.al_buffers.AlWavBuffer(this).loadFrom(p_file));
@@ -488,6 +496,9 @@ public class NerdAl {
 		return new AlSource(this, new AlOggBuffer(this).loadFrom(p_filePath));
 	}
 
+	/**
+	 * @deprecated We don't support WAV files for now.
+	 */
 	@Deprecated
 	public AlSource sourceFromWav(final String p_filePath) {
 		return new AlSource(this, new com.brahvim.nerd.openal.al_buffers.AlWavBuffer(this).loadFrom(p_filePath));
@@ -527,27 +538,25 @@ public class NerdAl {
 
 	@SuppressWarnings("deprecation")
 	public void completeDisposal() {
-		ArrayList<? extends AlNativeResource> list = null;
 
 		for (int listId = 0; listId < 8; listId++) {
-			switch (listId) {
+			final ArrayList<? extends AlNativeResource> list = switch (listId) {
 				// Yes, I know some of these can reference the `protected` `ArrayList` directly.
 				// Is this an extremely heavy resource?:
-				case 0 -> list = AlCapture.getAllInstances();
-				case 1 -> list = AlFilter.getAllInstances();
-				case 2 -> list = AlEffect.getAllInstances();
-				case 3 -> list = AlAuxiliaryEffectSlot.getAllInstances(); // Always after the other two!
-				case 4 -> list = AlSource.getAllInstances(); // Before the buffers!
-				case 5 -> list = AlBuffer.getAllInstances(); // ...After the sources.
-				case 6 -> list = AlContext.getAllInstances();
-				case 7 -> list = AlDevice.getAllInstances();
-			}
+				case 0 -> AlCapture.ALL_INSTANCES;
+				case 1 -> AlFilter.ALL_INSTANCES;
+				case 2 -> AlEffect.ALL_INSTANCES;
+				case 3 -> AlAuxiliaryEffectSlot.ALL_INSTANCES; // Always after the other two!
+				case 4 -> AlSource.ALL_INSTANCES; // Before the buffers!
+				case 5 -> AlBuffer.ALL_INSTANCES; // ...After the sources.
+				case 6 -> AlContext.ALL_INSTANCES;
+				case 7 -> AlDevice.ALL_INSTANCES;
+				default -> null;
+			};
 
-			if (list == null)
-				continue;
-
-			for (int i = list.size() - 1; i > -1; i--)
-				list.get(i).disposeForcibly();
+			if (list != null)
+				for (int i = list.size() - 1; i > -1; i--)
+					list.get(i).disposeForcibly();
 		}
 	}
 
@@ -556,7 +565,7 @@ public class NerdAl {
 	}
 
 	protected AlContext createAl(final String p_deviceName, final AlContext.AlContextSettings p_contextSettings) {
-		this.device = new AlDevice(this);
+		this.device = new AlDevice(this, p_deviceName);
 		this.context = new AlContext(this, p_contextSettings);
 
 		// LWJGL objects:

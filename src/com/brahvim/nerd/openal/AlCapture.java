@@ -5,7 +5,8 @@ import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Objects;
 
-import org.lwjgl.openal.AL11;
+import org.lwjgl.openal.AL10;
+import org.lwjgl.openal.ALC10;
 import org.lwjgl.openal.ALC11;
 
 import com.brahvim.nerd.openal.al_buffers.AlWavBuffer;
@@ -16,6 +17,7 @@ import com.brahvim.nerd.openal.al_exceptions.AlcException;
  */
 @Deprecated
 public class AlCapture extends AlNativeResource {
+
 	// Y'know what?
 	// Using different OpenAL contexts probably doesn't matter here.
 
@@ -29,7 +31,7 @@ public class AlCapture extends AlNativeResource {
 
 	private long id;
 	private final NerdAl alMan;
-	private String deviceName;
+	private final String deviceName;
 	private Thread captureThread;
 	private ByteBuffer capturedData = ByteBuffer.allocate(0);
 
@@ -45,6 +47,7 @@ public class AlCapture extends AlNativeResource {
 
 	public AlCapture(final NerdAl p_alMan, final String p_deviceName) {
 		this.alMan = p_alMan;
+		this.deviceName = p_deviceName;
 		AlCapture.ALL_INSTANCES.add(this);
 	}
 	// endregion
@@ -65,12 +68,12 @@ public class AlCapture extends AlNativeResource {
 
 	// region Capture queries.
 	public static String getDefaultDeviceName() {
-		return ALC11.alcGetString(0, ALC11.ALC_CAPTURE_DEFAULT_DEVICE_SPECIFIER);
+		return ALC10.alcGetString(0, ALC11.ALC_CAPTURE_DEFAULT_DEVICE_SPECIFIER);
 	}
 
 	// region `startCapturing()` overloads.
 	public void startCapturing() {
-		this.startCapturing(44100, AL11.AL_FORMAT_MONO8, 1024);
+		this.startCapturing(44100, AL10.AL_FORMAT_MONO8, 1024);
 	}
 
 	public void startCapturing(final int p_format) {
@@ -81,7 +84,7 @@ public class AlCapture extends AlNativeResource {
 		this.startCapturing(p_sampleRate, p_format, p_format);
 	}
 
-	public void startCapturing(final int p_sampleRate, final int p_format, final int p_samplesPerBuffer) {
+	public synchronized void startCapturing(final int p_sampleRate, final int p_format, final int p_samplesPerBuffer) {
 		if (this.isCapturing()) {
 			System.err.println("OpenAL cannot start capturing whilst already doing it!");
 			return;
@@ -113,10 +116,9 @@ public class AlCapture extends AlNativeResource {
 
 				final ByteBuffer SAMPLES_BUFFER = ByteBuffer.allocate(p_samplesPerBuffer);
 
-				for (int i = 0; i < p_samplesPerBuffer; i = ALC11.alcGetInteger(
-						this.id, ALC11.ALC_CAPTURE_SAMPLES)) {
-					// System.out.printf("Captured `%d` samples.\n", i);
-				}
+				// for (int i = 0; i < p_samplesPerBuffer; i = ALC10.alcGetInteger(this.id,
+				// ALC11.ALC_CAPTURE_SAMPLES))
+				// System.out.printf("Captured `%d` samples.\n", i);
 
 				ALC11.alcCaptureSamples(this.id, SAMPLES_BUFFER, p_samplesPerBuffer);
 
@@ -157,7 +159,8 @@ public class AlCapture extends AlNativeResource {
 	}
 
 	public boolean isCapturing() {
-		return this.captureThread == null ? false : this.captureThread.isAlive();
+		// return this.captureThread == null ? false : this.captureThread.isAlive();
+		return this.captureThread != null && this.captureThread.isAlive();
 	}
 
 	public AlWavBuffer stopCapturing(final AlWavBuffer p_buffer) {
@@ -166,10 +169,8 @@ public class AlCapture extends AlNativeResource {
 		return p_buffer;
 	}
 
-	public ByteBuffer stopCapturing() {
-		if (this.captureThread == null)
-			return this.capturedData;
-		else if (!this.captureThread.isAlive())
+	public synchronized ByteBuffer stopCapturing() {
+		if (this.captureThread == null || !this.captureThread.isAlive())
 			return this.capturedData;
 
 		this.captureThread.interrupt();

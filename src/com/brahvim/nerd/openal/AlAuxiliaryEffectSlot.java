@@ -4,7 +4,7 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 
-import org.lwjgl.openal.AL11;
+import org.lwjgl.openal.AL10;
 import org.lwjgl.openal.EXTEfx;
 import org.lwjgl.system.MemoryStack;
 
@@ -296,7 +296,7 @@ public class AlAuxiliaryEffectSlot extends AlNativeResource {
 
 	public AlAuxiliaryEffectSlot setAutoSend(final boolean p_value) {
 		EXTEfx.alAuxiliaryEffectSloti(this.id, EXTEfx.AL_EFFECTSLOT_AUXILIARY_SEND_AUTO,
-				p_value ? AL11.AL_TRUE : AL11.AL_FALSE);
+				p_value ? AL10.AL_TRUE : AL10.AL_FALSE);
 		return this;
 	}
 	// endregion
@@ -322,7 +322,7 @@ public class AlAuxiliaryEffectSlot extends AlNativeResource {
 		final IntBuffer buffer = MemoryStack.stackMallocInt(p_vecSize);
 
 		if (super.hasDisposed)
-			return null;
+			return new int[0];
 
 		EXTEfx.alGetAuxiliaryEffectSlotiv(this.id, p_alEnum, buffer);
 
@@ -352,7 +352,7 @@ public class AlAuxiliaryEffectSlot extends AlNativeResource {
 		final FloatBuffer buffer = MemoryStack.stackMallocFloat(p_vecSize);
 
 		if (super.hasDisposed)
-			return null;
+			return new float[0];
 
 		EXTEfx.alGetAuxiliaryEffectSlotfv(this.id, p_alEnum, buffer);
 

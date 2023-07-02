@@ -16,7 +16,7 @@ public abstract class AlFilter extends AlNativeResource {
 	private final NerdAl alMan;
 	// endregion
 
-	public AlFilter(final NerdAl p_alMan) {
+	protected AlFilter(final NerdAl p_alMan) {
 		AlFilter.ALL_INSTANCES.add(this);
 
 		this.alMan = p_alMan;
@@ -43,7 +43,7 @@ public abstract class AlFilter extends AlNativeResource {
 		final IntBuffer buffer = MemoryStack.stackMallocInt(1);
 
 		if (super.hasDisposed)
-			return -Integer.MIN_VALUE;
+			return Integer.MIN_VALUE;
 
 		EXTEfx.alGetFilteri(this.id, p_alEnum, buffer);
 
@@ -58,7 +58,7 @@ public abstract class AlFilter extends AlNativeResource {
 		final IntBuffer buffer = MemoryStack.stackMallocInt(p_vecSize);
 
 		if (super.hasDisposed)
-			return null;
+			return new int[0];
 
 		EXTEfx.alGetFilteriv(this.id, p_alEnum, buffer);
 
@@ -88,7 +88,7 @@ public abstract class AlFilter extends AlNativeResource {
 		final FloatBuffer buffer = MemoryStack.stackMallocFloat(p_vecSize);
 
 		if (super.hasDisposed)
-			return null;
+			return new float[0];
 
 		EXTEfx.alGetFilterfv(this.id, p_alEnum, buffer);
 

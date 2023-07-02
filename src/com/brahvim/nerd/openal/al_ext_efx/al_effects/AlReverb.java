@@ -1,6 +1,6 @@
 package com.brahvim.nerd.openal.al_ext_efx.al_effects;
 
-import org.lwjgl.openal.AL11;
+import org.lwjgl.openal.AL10;
 import org.lwjgl.openal.EXTEfx;
 
 import com.brahvim.nerd.openal.AlEffect;
@@ -67,7 +67,7 @@ public class AlReverb extends AlEffect {
 	}
 
 	public boolean getReverbDecayHfLimit() {
-		return super.getInt(EXTEfx.AL_REVERB_DECAY_HFLIMIT) == AL11.AL_TRUE;
+		return super.getInt(EXTEfx.AL_REVERB_DECAY_HFLIMIT) == AL10.AL_TRUE;
 	}
 	// endregion
 
@@ -133,7 +133,7 @@ public class AlReverb extends AlEffect {
 	}
 
 	public AlReverb setReverbDecayHfLimit(final boolean p_value) {
-		super.setInt(EXTEfx.AL_REVERB_DECAY_HFLIMIT, p_value ? AL11.AL_TRUE : AL11.AL_FALSE);
+		super.setInt(EXTEfx.AL_REVERB_DECAY_HFLIMIT, p_value ? AL10.AL_TRUE : AL10.AL_FALSE);
 		return this;
 	}
 	// endregion

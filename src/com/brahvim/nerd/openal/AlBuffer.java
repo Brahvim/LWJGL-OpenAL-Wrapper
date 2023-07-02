@@ -6,8 +6,9 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 
+import org.lwjgl.openal.AL10;
 import org.lwjgl.openal.AL11;
-import org.lwjgl.openal.ALC11;
+import org.lwjgl.openal.ALC10;
 import org.lwjgl.system.MemoryStack;
 
 // If "`BufferT`" sounds weird to you, check out: 
@@ -16,7 +17,7 @@ import org.lwjgl.system.MemoryStack;
 public abstract class AlBuffer<BufferT extends Buffer> extends AlNativeResource {
 
 	// region Fields.
-	public static final ArrayList<AlBuffer<?>> ALL_INSTANCES = new ArrayList<>();
+	protected static final ArrayList<AlBuffer<?>> ALL_INSTANCES = new ArrayList<>();
 
 	// No OpenAL implementation provides `AL_DATA`.
 	// Storing it here!
@@ -26,20 +27,20 @@ public abstract class AlBuffer<BufferT extends Buffer> extends AlNativeResource 
 	// endregion
 
 	// region Constructors.
-	public AlBuffer(final NerdAl p_alMan) {
+	protected AlBuffer(final NerdAl p_alMan) {
 		this.alMan = p_alMan;
 		AlBuffer.ALL_INSTANCES.add(this);
 
-		this.id = AL11.alGenBuffers();
+		this.id = AL10.alGenBuffers();
 		this.alMan.checkAlError();
 	}
 
 	@SuppressWarnings("unchecked")
-	public AlBuffer(final AlBuffer<?> p_buffer) {
+	protected AlBuffer(final AlBuffer<?> p_buffer) {
 		AlBuffer.ALL_INSTANCES.add(this);
 
 		this.alMan = p_buffer.alMan;
-		this.id = AL11.alGenBuffers();
+		this.id = AL10.alGenBuffers();
 		this.alFormat = p_buffer.alFormat;
 
 		this.setBits(p_buffer.getBits());
@@ -49,19 +50,10 @@ public abstract class AlBuffer<BufferT extends Buffer> extends AlNativeResource 
 		this.alMan.checkAlError();
 	}
 
-	public AlBuffer(final NerdAl p_alMan, final int p_id) {
+	protected AlBuffer(final NerdAl p_alMan, final int p_id) {
 		AlBuffer.ALL_INSTANCES.add(this);
-
-		this.id = p_id;
 		this.alMan = p_alMan;
-	}
-
-	public AlBuffer(final NerdAl p_alInst, final BufferT p_data) {
-		AlBuffer.ALL_INSTANCES.add(this);
-		this.alMan = p_alInst;
-
-		this.id = AL11.alGenBuffers();
-		this.alMan.checkAlError();
+		this.id = p_id;
 	}
 	// endregion
 
@@ -105,7 +97,7 @@ public abstract class AlBuffer<BufferT extends Buffer> extends AlNativeResource 
 		if (super.hasDisposed)
 			return Integer.MIN_VALUE;
 
-		return AL11.alGetBufferi(this.id, p_alEnum);
+		return AL10.alGetBufferi(this.id, p_alEnum);
 	}
 
 	public float getFloat(final int p_alEnum) {
@@ -113,7 +105,7 @@ public abstract class AlBuffer<BufferT extends Buffer> extends AlNativeResource 
 		if (super.hasDisposed)
 			return -Float.MAX_VALUE;
 
-		return AL11.alGetBufferf(this.id, p_alEnum);
+		return AL10.alGetBufferf(this.id, p_alEnum);
 	}
 
 	// Vectors in OpenAL are not large and can be allocated on the stack just fine.
@@ -122,7 +114,7 @@ public abstract class AlBuffer<BufferT extends Buffer> extends AlNativeResource 
 		final IntBuffer intBuffer = MemoryStack.stackMallocInt(p_vecSize);
 
 		if (super.hasDisposed)
-			return null;
+			return new int[0];
 
 		AL11.alGetBufferiv(this.id, p_alEnum, intBuffer);
 		MemoryStack.stackPop();
@@ -135,7 +127,7 @@ public abstract class AlBuffer<BufferT extends Buffer> extends AlNativeResource 
 		final FloatBuffer floatBuffer = MemoryStack.stackMallocFloat(p_vecSize);
 
 		if (super.hasDisposed)
-			return null;
+			return new float[0];
 
 		AL11.alGetBufferfv(this.id, p_alEnum, floatBuffer);
 		MemoryStack.stackPop();
@@ -148,7 +140,7 @@ public abstract class AlBuffer<BufferT extends Buffer> extends AlNativeResource 
 		final IntBuffer intBuffer = MemoryStack.stackMallocInt(3);
 
 		if (super.hasDisposed)
-			return null;
+			return new int[0];
 
 		AL11.alGetBufferiv(this.id, p_alEnum, intBuffer);
 		MemoryStack.stackPop();
@@ -161,7 +153,7 @@ public abstract class AlBuffer<BufferT extends Buffer> extends AlNativeResource 
 		final FloatBuffer floatBuffer = MemoryStack.stackMallocFloat(3);
 
 		if (super.hasDisposed)
-			return null;
+			return new float[0];
 
 		AL11.alGetBufferfv(this.id, p_alEnum, floatBuffer);
 		MemoryStack.stackPop();
@@ -235,15 +227,15 @@ public abstract class AlBuffer<BufferT extends Buffer> extends AlNativeResource 
 	}
 
 	public int getSize() {
-		return this.getInt(AL11.AL_SIZE);
+		return this.getInt(AL10.AL_SIZE);
 	}
 
 	public int getBits() {
-		return this.getInt(AL11.AL_BITS);
+		return this.getInt(AL10.AL_BITS);
 	}
 
 	public int getChannels() {
-		return this.getInt(AL11.AL_CHANNELS);
+		return this.getInt(AL10.AL_CHANNELS);
 	}
 
 	public BufferT getData() {
@@ -251,30 +243,30 @@ public abstract class AlBuffer<BufferT extends Buffer> extends AlNativeResource 
 	}
 
 	public int getSampleRate() {
-		return this.getInt(ALC11.ALC_FREQUENCY);
+		return this.getInt(ALC10.ALC_FREQUENCY);
 	}
 	// endregion
 
 	// region Setters.
 	public AlBuffer<BufferT> setBits(final int p_bits) {
-		AL11.alBufferi(this.id, AL11.AL_BITS, p_bits);
+		AL11.alBufferi(this.id, AL10.AL_BITS, p_bits);
 		return this;
 	}
 
 	public AlBuffer<BufferT> setChannels(final int p_channels) {
-		AL11.alBufferi(this.id, AL11.AL_CHANNELS, p_channels);
+		AL11.alBufferi(this.id, AL10.AL_CHANNELS, p_channels);
 		return this;
 	}
 
 	public AlBuffer<BufferT> setSampleRate(final int p_sampleRate) {
-		AL11.alBufferi(this.id, AL11.AL_FREQUENCY, p_sampleRate);
+		AL11.alBufferi(this.id, AL10.AL_FREQUENCY, p_sampleRate);
 		return this;
 	}
 	// endregion
 
 	@Override
 	protected void disposeImpl() {
-		AL11.alDeleteBuffers(this.id);
+		AL10.alDeleteBuffers(this.id);
 		this.alMan.checkAlError();
 		AlBuffer.ALL_INSTANCES.remove(this);
 	}

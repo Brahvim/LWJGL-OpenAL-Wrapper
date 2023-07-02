@@ -4,7 +4,7 @@ import java.io.File;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 
-import org.lwjgl.openal.AL11;
+import org.lwjgl.openal.AL10;
 
 import com.brahvim.nerd.openal.AlBuffer;
 import com.brahvim.nerd.openal.NerdAl;
@@ -23,10 +23,6 @@ public class AlNoTypeBuffer extends AlBuffer<Buffer> {
 	public AlNoTypeBuffer(final NerdAl p_alMan, final int p_id) {
 		super(p_alMan, p_id);
 	}
-
-	public AlNoTypeBuffer(final NerdAl p_alInst, final Buffer p_data) {
-		super(p_alInst, p_data);
-	}
 	// endregion
 
 	@Override
@@ -44,7 +40,7 @@ public class AlNoTypeBuffer extends AlBuffer<Buffer> {
 
 	@Override
 	protected void setDataImpl(final int p_format, final Buffer p_buffer, final int p_sampleRate) {
-		AL11.alBufferData(this.id, p_format, (ByteBuffer) p_buffer, p_sampleRate);
+		AL10.alBufferData(this.id, p_format, (ByteBuffer) p_buffer, p_sampleRate);
 	}
 
 }

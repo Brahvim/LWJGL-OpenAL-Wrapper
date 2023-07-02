@@ -4,7 +4,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 
-import org.lwjgl.openal.AL11;
+import org.lwjgl.openal.AL10;
 
 import com.brahvim.nerd.openal.al_buffers.AlOggBuffer;
 
@@ -53,7 +53,7 @@ public class AlDataStream {
 	public synchronized void stop() {
 		// Page `14` of the "OpenAL Programmer's Guide" mentions this
 		// nice shortcut to remove all attached buffers from a source:
-		this.source.setInt(AL11.AL_BUFFER, 0);
+		this.source.setInt(AL10.AL_BUFFER, 0);
 		this.alMan.checkAlError();
 
 		// Should I actually be doing this...?

@@ -1,6 +1,6 @@
 package com.brahvim.nerd.openal.al_ext_efx.al_effects;
 
-import org.lwjgl.openal.AL11;
+import org.lwjgl.openal.AL10;
 import org.lwjgl.openal.EXTEfx;
 
 import com.brahvim.nerd.openal.AlEffect;
@@ -18,11 +18,11 @@ public class AlCompressor extends AlEffect {
 	}
 
 	public boolean getStatus() {
-		return super.getInt(EXTEfx.AL_COMPRESSOR_ONOFF) == AL11.AL_TRUE;
+		return super.getInt(EXTEfx.AL_COMPRESSOR_ONOFF) == AL10.AL_TRUE;
 	}
 
 	public AlCompressor setStatus(final boolean p_value) {
-		super.setInt(EXTEfx.AL_COMPRESSOR_ONOFF, p_value ? AL11.AL_TRUE : AL11.AL_FALSE);
+		super.setInt(EXTEfx.AL_COMPRESSOR_ONOFF, p_value ? AL10.AL_TRUE : AL10.AL_FALSE);
 		return this;
 	}
 

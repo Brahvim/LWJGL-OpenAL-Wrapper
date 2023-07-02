@@ -2,6 +2,7 @@ package com.brahvim.nerd.openal;
 
 import java.util.ArrayList;
 
+import org.lwjgl.openal.ALC10;
 import org.lwjgl.openal.ALC11;
 
 import com.brahvim.nerd.openal.al_exceptions.NerdAlException;
@@ -16,11 +17,11 @@ public class AlContext extends AlNativeResource {
 
 		public int[] asAttribArray() {
 			return new int[] {
-					ALC11.ALC_FREQUENCY, this.frequency,
+					ALC10.ALC_FREQUENCY, this.frequency,
 					ALC11.ALC_MONO_SOURCES, this.monoSources,
 					ALC11.ALC_STEREO_SOURCES, this.stereoSources,
-					ALC11.ALC_REFRESH, this.refresh,
-					ALC11.ALC_SYNC, this.sync ? ALC11.ALC_TRUE : ALC11.ALC_FALSE
+					ALC10.ALC_REFRESH, this.refresh,
+					ALC10.ALC_SYNC, this.sync ? ALC10.ALC_TRUE : ALC10.ALC_FALSE
 			};
 		}
 
@@ -87,11 +88,11 @@ public class AlContext extends AlNativeResource {
 			p_settings = new AlContextSettings();
 		}
 
-		final long toRet = ALC11.alcCreateContext(this.deviceId, p_settings.asAttribArray());
+		final long toRet = ALC10.alcCreateContext(this.deviceId, p_settings.asAttribArray());
 		this.alMan.checkAlcError();
 
 		// Placing the check into a boolean to check for errors right away!
-		final boolean ctxVerifStatus = ALC11.alcMakeContextCurrent(toRet);
+		final boolean ctxVerifStatus = ALC10.alcMakeContextCurrent(toRet);
 		this.alMan.checkAlcError();
 
 		if (toRet == 0 || !ctxVerifStatus)
@@ -103,14 +104,14 @@ public class AlContext extends AlNativeResource {
 	@Override
 	protected void disposeImpl() {
 		// Unlink the current context object:
-		if (!ALC11.alcMakeContextCurrent(0))
+		if (!ALC10.alcMakeContextCurrent(0))
 			throw new NerdAlException(
 					"Could not change the OpenAL context (whilst disposing one)!");
 
 		this.alMan.checkAlcError();
 
 		// *Actually* destroy the context object:
-		ALC11.alcDestroyContext(this.id);
+		ALC10.alcDestroyContext(this.id);
 
 		this.alMan.checkAlcError();
 		AlContext.ALL_INSTANCES.remove(this);

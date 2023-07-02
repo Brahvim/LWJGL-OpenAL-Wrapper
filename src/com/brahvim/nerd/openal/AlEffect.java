@@ -17,7 +17,7 @@ public abstract class AlEffect extends AlNativeResource {
 	protected AlAuxiliaryEffectSlot slot;
 	// endregion
 
-	public AlEffect(final NerdAl p_nerdAl) {
+	protected AlEffect(final NerdAl p_nerdAl) {
 		AlEffect.ALL_INSTANCES.add(this);
 
 		this.alMan = p_nerdAl;
@@ -69,7 +69,7 @@ public abstract class AlEffect extends AlNativeResource {
 		final IntBuffer buffer = MemoryStack.stackMallocInt(p_vecSize);
 
 		if (super.hasDisposed)
-			return null;
+			return new int[0];
 
 		EXTEfx.alGetEffectiv(this.id, p_alEnum, buffer);
 
@@ -99,7 +99,7 @@ public abstract class AlEffect extends AlNativeResource {
 		final FloatBuffer buffer = MemoryStack.stackMallocFloat(p_vecSize);
 
 		if (super.hasDisposed)
-			return null;
+			return new float[0];
 
 		EXTEfx.alGetEffectfv(this.id, p_alEnum, buffer);
 

@@ -11,16 +11,21 @@ import java.util.ArrayList;
 
 import javax.sound.sampled.AudioFormat;
 
-import org.lwjgl.openal.AL11;
+import org.lwjgl.openal.AL10;
 
 import com.brahvim.nerd.openal.AlBuffer;
 import com.brahvim.nerd.openal.NerdAl;
 
 import fr.delthas.javamp3.Mp3InputStream;
 
+/**
+ * @deprecated I relied on an old library and doing that failed.
+ *             ...Only if I knew how to use it correctly!
+ */
 @Deprecated
 public class AlMp3Buffer extends AlBuffer<IntBuffer> {
-	public static final ArrayList<AlMp3Buffer> ALL_INSTANCES = new ArrayList<>();
+
+	protected static final ArrayList<AlMp3Buffer> ALL_INSTANCES = new ArrayList<>();
 
 	// region Constructors.
 	public AlMp3Buffer(final NerdAl p_alMan) {
@@ -37,11 +42,6 @@ public class AlMp3Buffer extends AlBuffer<IntBuffer> {
 		super(p_alMan, p_id);
 		AlMp3Buffer.ALL_INSTANCES.add(this);
 	}
-
-	public AlMp3Buffer(final NerdAl p_alInst, final IntBuffer p_data) {
-		super(p_alInst, p_data);
-		AlMp3Buffer.ALL_INSTANCES.add(this);
-	}
 	// endregion
 
 	@Override
@@ -52,7 +52,7 @@ public class AlMp3Buffer extends AlBuffer<IntBuffer> {
 
 	@Override
 	protected void setDataImpl(final int p_format, final IntBuffer p_buffer, final int p_sampleRate) {
-		AL11.alBufferData(this.id, p_format, p_buffer, p_sampleRate);
+		AL10.alBufferData(this.id, p_format, p_buffer, p_sampleRate);
 	}
 
 	@Override
@@ -66,7 +66,7 @@ public class AlMp3Buffer extends AlBuffer<IntBuffer> {
 	protected AlMp3Buffer loadFromImpl(final File p_file) {
 		AudioFormat format = null;
 		final ByteArrayOutputStream bytes = new ByteArrayOutputStream(
-				(int) Math.min((long) Integer.MAX_VALUE, p_file.length()));
+				(int) Math.min(Integer.MAX_VALUE, p_file.length()));
 
 		try (final Mp3InputStream stream = new Mp3InputStream(new FileInputStream(p_file))) {
 			format = stream.getAudioFormat();
@@ -76,10 +76,13 @@ public class AlMp3Buffer extends AlBuffer<IntBuffer> {
 			e.printStackTrace();
 		}
 
-		AL11.alBufferData(this.id,
+		if (format == null)
+			return null;
+
+		AL10.alBufferData(this.id,
 				super.alFormat = format.getChannels() == 1
-						? AL11.AL_FORMAT_MONO16
-						: AL11.AL_FORMAT_STEREO16,
+						? AL10.AL_FORMAT_MONO16
+						: AL10.AL_FORMAT_STEREO16,
 				ByteBuffer.wrap(bytes.toByteArray())
 						.order(ByteOrder.nativeOrder()).asIntBuffer(),
 				(int) format.getSampleRate());

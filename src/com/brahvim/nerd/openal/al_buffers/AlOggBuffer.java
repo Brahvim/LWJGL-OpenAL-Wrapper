@@ -6,7 +6,7 @@ import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 import java.util.ArrayList;
 
-import org.lwjgl.openal.AL11;
+import org.lwjgl.openal.AL10;
 import org.lwjgl.stb.STBVorbis;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.libc.LibCStdlib;
@@ -15,7 +15,8 @@ import com.brahvim.nerd.openal.AlBuffer;
 import com.brahvim.nerd.openal.NerdAl;
 
 public class AlOggBuffer extends AlBuffer<ShortBuffer> {
-	public static final ArrayList<AlOggBuffer> ALL_INSTANCES = new ArrayList<>();
+
+	protected static final ArrayList<AlOggBuffer> ALL_INSTANCES = new ArrayList<>();
 
 	// region Constructors.
 	public AlOggBuffer(final NerdAl p_alMan) {
@@ -32,28 +33,31 @@ public class AlOggBuffer extends AlBuffer<ShortBuffer> {
 		super(p_alMan, p_id);
 		AlOggBuffer.ALL_INSTANCES.add(this);
 	}
-
-	public AlOggBuffer(final NerdAl p_alInst, final ShortBuffer p_data) {
-		super(p_alInst, p_data);
-		AlOggBuffer.ALL_INSTANCES.add(this);
-	}
 	// endregion
 
 	// Free the buffer (or not) :D
 	@Override
 	protected void disposeImpl() {
 		super.disposeImpl();
-		LibCStdlib.free(super.data); // Yep, we literally made Java, C. "Welcome to JavaC!" :joy:
+		LibCStdlib.free(super.data); // Yep, we literally made Java, C. "Welcome to javac!" :joy:
 		AlOggBuffer.ALL_INSTANCES.remove(this);
 	}
 
 	@Override
 	protected void setDataImpl(final int p_format, final ShortBuffer p_buffer, final int p_sampleRate) {
-		AL11.alBufferData(this.id, p_format, p_buffer, p_sampleRate);
+		AL10.alBufferData(super.id, p_format, p_buffer, p_sampleRate);
 	}
 
 	@Override
 	protected AlOggBuffer loadFromImpl(final File p_file) {
+		if (super.id != 0) {
+			AL10.alDeleteBuffers(super.id);
+			super.alMan.checkAlError();
+		}
+
+		if (super.data != null)
+			LibCStdlib.free(super.data); // Yep, we literally made Java, C. "Welcome to javac!" :joy:
+
 		// A note about the use of `org.lwjgl.system.MemoryStack`:
 		/*
 		 * LWJGL's `MemoryStack` class allows for stack allocations.
@@ -87,16 +91,15 @@ public class AlOggBuffer extends AlBuffer<ShortBuffer> {
 
 			// Give the OpenAL buffer the data:
 
-			AL11.alBufferData(this.id,
+			AL10.alBufferData(super.id,
 					super.alFormat = channelsBuffer.get() == 1
-							? AL11.AL_FORMAT_MONO16
-							: AL11.AL_FORMAT_STEREO16,
+							? AL10.AL_FORMAT_MONO16
+							: AL10.AL_FORMAT_STEREO16,
 					rawAudioBuffer, sampleRateBuffer.get());
 
 			// We're done. Remove the previous two allocations.
 			MemoryStack.stackPop();
 			MemoryStack.stackPop();
-
 		} catch (final IOException e) {
 			e.printStackTrace();
 		}
