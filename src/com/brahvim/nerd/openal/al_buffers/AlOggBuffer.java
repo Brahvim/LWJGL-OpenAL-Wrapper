@@ -50,13 +50,14 @@ public class AlOggBuffer extends AlBuffer<ShortBuffer> {
 
 	@Override
 	protected AlOggBuffer loadFromImpl(final File p_file) {
-		if (super.id != 0) {
-			AL10.alDeleteBuffers(super.id);
-			super.alMan.checkAlError();
-		}
+		if (super.hasDisposed)
+			throw new IllegalArgumentException("This `AlBuffer` was deallocated. Please use a new one!");
 
-		if (super.data != null)
+		// If we have any data, we free it:
+		if (super.data != null) {
 			LibCStdlib.free(super.data); // Yep, we literally made Java, C. "Welcome to javac!" :joy:
+			super.data = null;
+		}
 
 		// A note about the use of `org.lwjgl.system.MemoryStack`:
 		/*
@@ -89,8 +90,8 @@ public class AlOggBuffer extends AlBuffer<ShortBuffer> {
 				MemoryStack.stackPop();
 			}
 
-			// Give the OpenAL buffer the data:
-
+			// Give the OpenAL buffer the data.
+			// (Sure, I'll just use a raw AL call...):
 			AL10.alBufferData(super.id,
 					super.alFormat = channelsBuffer.get() == 1
 							? AL10.AL_FORMAT_MONO16

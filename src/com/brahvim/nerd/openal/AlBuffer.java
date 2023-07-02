@@ -28,10 +28,18 @@ public abstract class AlBuffer<BufferT extends Buffer> extends AlNativeResource 
 
 	// region Constructors.
 	protected AlBuffer(final NerdAl p_alMan) {
+		System.out.println("`AlBuffer.AlBuffer(NerdAl)`");
+		System.out.flush();
+
 		this.alMan = p_alMan;
 		AlBuffer.ALL_INSTANCES.add(this);
+		this.alMan.checkAlError();
 
+		System.out.println("`AlBuffer.AlBuffer(NerdAl)`: Generating buffers...");
+		System.out.flush();
 		this.id = AL10.alGenBuffers();
+		System.out.println("`AlBuffer.AlBuffer(NerdAl)`: Checking for errors...");
+		System.out.flush();
 		this.alMan.checkAlError();
 	}
 
@@ -40,17 +48,22 @@ public abstract class AlBuffer<BufferT extends Buffer> extends AlNativeResource 
 		AlBuffer.ALL_INSTANCES.add(this);
 
 		this.alMan = p_buffer.alMan;
-		this.id = AL10.alGenBuffers();
 		this.alFormat = p_buffer.alFormat;
 
-		this.setBits(p_buffer.getBits());
-		this.setChannels(p_buffer.getChannels());
-		this.setDataImpl(p_buffer.alFormat, (BufferT) p_buffer.getData(), p_buffer.getSampleRate());
+		this.id = AL10.alGenBuffers();
+		this.alMan.checkAlError();
 
+		// These aren't set individually:
+		// this.setBits(p_buffer.getBits());
+		// this.setChannels(p_buffer.getChannels());
+		this.setDataImpl(p_buffer.alFormat, (BufferT) p_buffer.getData(), p_buffer.getSampleRate());
 		this.alMan.checkAlError();
 	}
 
 	protected AlBuffer(final NerdAl p_alMan, final int p_id) {
+		if (!NerdAl.isBuffer(p_id))
+			throw new IllegalArgumentException("`AlBuffer.AlBuffer(NerdAL, int)` received an invalid buffer ID.");
+
 		AlBuffer.ALL_INSTANCES.add(this);
 		this.alMan = p_alMan;
 		this.id = p_id;
@@ -248,20 +261,23 @@ public abstract class AlBuffer<BufferT extends Buffer> extends AlNativeResource 
 	// endregion
 
 	// region Setters.
-	public AlBuffer<BufferT> setBits(final int p_bits) {
-		AL11.alBufferi(this.id, AL10.AL_BITS, p_bits);
-		return this;
-	}
-
-	public AlBuffer<BufferT> setChannels(final int p_channels) {
-		AL11.alBufferi(this.id, AL10.AL_CHANNELS, p_channels);
-		return this;
-	}
-
-	public AlBuffer<BufferT> setSampleRate(final int p_sampleRate) {
-		AL11.alBufferi(this.id, AL10.AL_FREQUENCY, p_sampleRate);
-		return this;
-	}
+	// `alBufferi()` is only for extensions!
+	/*
+	 * public AlBuffer<BufferT> setBits(final int p_bits) {
+	 * AL11.alBufferi(this.id, AL10.AL_BITS, p_bits);
+	 * return this;
+	 * }
+	 * 
+	 * public AlBuffer<BufferT> setChannels(final int p_channels) {
+	 * AL11.alBufferi(this.id, AL10.AL_CHANNELS, p_channels);
+	 * return this;
+	 * }
+	 * 
+	 * public AlBuffer<BufferT> setSampleRate(final int p_sampleRate) {
+	 * AL11.alBufferi(this.id, AL10.AL_FREQUENCY, p_sampleRate);
+	 * return this;
+	 * }
+	 */
 	// endregion
 
 	@Override

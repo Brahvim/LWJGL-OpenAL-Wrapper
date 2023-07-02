@@ -27,18 +27,18 @@ public class AlDevice extends AlNativeResource {
 	// endregion
 
 	// region Constructors.
-	public AlDevice(final NerdAl p_manager) {
-		this(p_manager, AlDevice.getDefaultDeviceName());
+	public AlDevice(final NerdAl p_alMan) {
+		this(p_alMan, AlDevice.getDefaultDeviceName());
 	}
 
-	public AlDevice(final NerdAl p_manager, final String p_deviceName) {
+	public AlDevice(final NerdAl p_alMan, final String p_deviceName) {
 		AlDevice.ALL_INSTANCES.add(this);
 
-		this.alMan = p_manager;
+		this.alMan = p_alMan;
 		this.name = p_deviceName;
 		this.id = ALC10.alcOpenDevice(this.name);
 
-		// Check for errors:ALC10
+		// Check for errors here because we can't call `NerdAl::checkAlcError()` yet:
 		final int alcError = ALC10.alcGetError(this.id);
 		if (alcError != 0)
 			throw new AlcException(this.id, alcError);

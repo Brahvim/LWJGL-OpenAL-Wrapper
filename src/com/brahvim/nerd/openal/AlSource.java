@@ -4,6 +4,7 @@ import java.nio.Buffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
+import java.util.Objects;
 
 import org.lwjgl.openal.AL10;
 import org.lwjgl.openal.AL11;
@@ -122,7 +123,7 @@ public class AlSource extends AlNativeResource {
 	}
 
 	public AlSource setBuffer(final AlBuffer<?> p_buffer) {
-		this.buffer = p_buffer;
+		this.buffer = Objects.requireNonNull(p_buffer);
 		this.setInt(AL10.AL_BUFFER, this.buffer.getId());
 		return this;
 	}

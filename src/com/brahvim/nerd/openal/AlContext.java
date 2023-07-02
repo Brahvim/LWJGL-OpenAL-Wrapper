@@ -37,14 +37,14 @@ public class AlContext extends AlNativeResource {
 	// endregion
 
 	// region Constructors.
-	public AlContext(final NerdAl p_manager) {
-		this(p_manager, new AlContext.AlContextSettings());
+	public AlContext(final NerdAl p_alMan) {
+		this(p_alMan, new AlContext.AlContextSettings());
 	}
 
-	public AlContext(final NerdAl p_manager, final AlContext.AlContextSettings p_settings) {
-		this.alMan = p_manager;
+	public AlContext(final NerdAl p_alMan, final AlContext.AlContextSettings p_settings) {
+		this.alMan = p_alMan;
 		this.buffers = new ArrayList<>();
-		this.device = p_manager.getDevice();
+		this.device = p_alMan.getDevice();
 		this.deviceId = this.device.getId();
 		this.id = this.createCtx(p_settings);
 
