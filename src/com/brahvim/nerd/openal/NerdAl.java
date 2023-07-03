@@ -23,14 +23,8 @@ import com.brahvim.nerd.openal.al_exceptions.NerdAbstractOpenAlException;
 public class NerdAl {
 
 	// region Fields.
-	public static final float UNIT_SIZE_3D_PARK_SCENE = 100.0f;
-	public static final float UNIT_SIZE_MOUSE_RELATIVE = 1.0f;
-	public static final float UNIT_SIZE_2D_SCENE = 25.0f;
-
 	public final long DEFAULT_CONTEXT_ID;
 	public final AlContext DEFAULT_CONTEXT;
-
-	public float unitSize = NerdAl.UNIT_SIZE_3D_PARK_SCENE;
 
 	private ALCapabilities alCap;
 	private ALCCapabilities alCtxCap;
