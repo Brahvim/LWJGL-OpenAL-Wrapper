@@ -5,6 +5,7 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.Vector;
 
 import org.lwjgl.openal.AL10;
 import org.lwjgl.openal.AL11;
@@ -18,7 +19,9 @@ import com.brahvim.nerd.openal.al_buffers.AlOggBuffer;
 public class AlSource extends AlNativeResource {
 
 	// region Fields.
-	protected static final ArrayList<AlSource> ALL_INSTANCES = new ArrayList<>();
+	protected static final Vector<AlSource>
+	/*	 */ ALL_INSTANCES = new Vector<>(),
+			INSTANCES_TO_REMOVE = new Vector<>(0);
 
 	private final int id;
 	private final NerdAl alMan;
@@ -31,7 +34,7 @@ public class AlSource extends AlNativeResource {
 	private boolean plooping, looping;
 
 	private AlBuffer<?> buffer;
-	private AlDataStream stream;
+	private AlBufferStream stream;
 	private AlAuxiliaryEffectSlot effectSlot;
 	private boolean disposeOnPlay, disposeBufferOnPlay;
 	private AlFilter directFilter, auxiliarySendFilter;
@@ -60,13 +63,14 @@ public class AlSource extends AlNativeResource {
 		this.alMan.checkAlError();
 
 		// region Transfer properties over (hopefully, the JIT inlines!):
+		// this.setSourceType(p_source.getSourceType()); // Disallowed by OpenAL!
+
 		this.setBuffer(p_source.buffer);
 		this.setGain(p_source.getGain());
 		this.setMinGain(p_source.getMinGain());
 		this.setMaxGain(p_source.getMaxGain());
 		this.setPosition(p_source.getPosition());
 		this.setVelocity(p_source.getVelocity());
-		// this.setSourceType(p_source.getSourceType());
 		this.setDirection(p_source.getDirection());
 		this.setMaxDistance(p_source.getMaxDistance());
 		this.setSampleOffset(p_source.getSampleOffset());
@@ -706,11 +710,11 @@ public class AlSource extends AlNativeResource {
 		AL10.alSourceRewind(this.id);
 	}
 
-	public AlDataStream getStream() {
+	public AlBufferStream getStream() {
 		return this.stream;
 	}
 
-	public AlSource setStream(final AlDataStream p_alDataStream) {
+	public AlSource setStream(final AlBufferStream p_alDataStream) {
 		this.stream = p_alDataStream;
 		return this;
 	}
@@ -779,7 +783,7 @@ public class AlSource extends AlNativeResource {
 		this.alMan.checkAlcError();
 		AL10.alDeleteSources(this.id);
 		this.alMan.checkAlError();
-		AlSource.ALL_INSTANCES.remove(this);
+		AlSource.INSTANCES_TO_REMOVE.add(this);
 	}
 	// endregion
 

@@ -1,13 +1,14 @@
 package com.brahvim.nerd.openal;
 
 import java.util.ArrayList;
+import java.util.Vector;
 
-public abstract class AlNativeResource {
+public abstract class AlNativeResource /* implements Closeable */ {
 
 	// region Fields and constructor.
 	protected boolean hasDisposed, willDispose = true;
 
-	private static ArrayList<AlNativeResource> ALL_INSTANCES = new ArrayList<>();
+	protected static Vector<AlNativeResource> ALL_INSTANCES = new Vector<>();
 
 	protected AlNativeResource() {
 		AlNativeResource.ALL_INSTANCES.add(this);
@@ -19,23 +20,25 @@ public abstract class AlNativeResource {
 		return AlNativeResource.ALL_INSTANCES.size();
 	}
 
-	public static ArrayList<AlNativeResource> getAllResources() {
+	public static ArrayList<AlNativeResource> getResourcesCopy() {
 		return new ArrayList<>(AlNativeResource.ALL_INSTANCES);
 	}
 	// endregion
 
-	// Yes, there's no `getId()` method here - IDs can be either `long`s or `int`s!
-
-	public final boolean shouldDispose(final boolean p_value) {
-		final boolean toRet = this.willDispose;
-		this.willDispose = p_value;
-		return toRet;
-	}
+	// Yes, there's no `getId()` method here.
+	// That's because OpenAL object IDs can be either of `long`s, or `int`s!
 
 	public final boolean isDisposed() {
 		return this.hasDisposed;
 	}
 
+	public final boolean setDisposability(final boolean p_value) {
+		final boolean toRet = this.willDispose;
+		this.willDispose = p_value;
+		return toRet;
+	}
+
+	// @Override public void close() { this.dispose(); }
 	public final void dispose() {
 		if (!this.willDispose)
 			return;

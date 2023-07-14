@@ -4,6 +4,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.Vector;
 
 import org.lwjgl.openal.AL10;
 import org.lwjgl.openal.ALC10;
@@ -22,7 +23,7 @@ public class AlCapture extends AlNativeResource {
 	// Using different OpenAL contexts probably doesn't matter here.
 
 	// region Fields.
-	protected static final ArrayList<AlCapture> ALL_INSTANCES = new ArrayList<>();
+	protected static final Vector<AlCapture> ALL_INSTANCES = new Vector<>();
 
 	private static int numInstances;
 

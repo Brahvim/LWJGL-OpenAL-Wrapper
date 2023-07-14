@@ -3,6 +3,7 @@ package com.brahvim.nerd.openal;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
+import java.util.Vector;
 
 import org.lwjgl.openal.EXTEfx;
 import org.lwjgl.system.MemoryStack;
@@ -10,7 +11,7 @@ import org.lwjgl.system.MemoryStack;
 public abstract class AlEffect extends AlNativeResource {
 
 	// region Fields.
-	protected static final ArrayList<AlEffect> ALL_INSTANCES = new ArrayList<>();
+	protected static final Vector<AlEffect> ALL_INSTANCES = new Vector<>();
 
 	protected int id;
 	protected NerdAl alMan;

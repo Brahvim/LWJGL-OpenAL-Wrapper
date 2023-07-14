@@ -1,5 +1,8 @@
 package com.brahvim.nerd.openal.al_exceptions;
 
+/**
+ * A "base class" for exceptions in this library that represent OpenAL errors.
+ */
 public abstract class NerdAbstractOpenAlException extends RuntimeException {
 
 	protected final int ERROR_CODE;

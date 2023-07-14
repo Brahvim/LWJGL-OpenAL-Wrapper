@@ -5,6 +5,7 @@ import java.nio.Buffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
+import java.util.Vector;
 
 import org.lwjgl.openal.AL10;
 import org.lwjgl.openal.AL11;
@@ -17,7 +18,7 @@ import org.lwjgl.system.MemoryStack;
 public abstract class AlBuffer<BufferT extends Buffer> extends AlNativeResource {
 
 	// region Fields.
-	protected static final ArrayList<AlBuffer<?>> ALL_INSTANCES = new ArrayList<>();
+	protected static final Vector<AlBuffer<?>> ALL_INSTANCES = new Vector<>();
 
 	// No OpenAL implementation provides `AL_DATA`.
 	// Storing it here!
@@ -79,7 +80,7 @@ public abstract class AlBuffer<BufferT extends Buffer> extends AlNativeResource 
 	}
 
 	public AlBuffer<?> loadFrom(final File p_file) {
-		super.shouldDispose(false);
+		super.setDisposability(false);
 		this.loadFromImpl(p_file);
 		return this;
 	}

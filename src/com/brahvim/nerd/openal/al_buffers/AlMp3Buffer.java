@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
-import java.util.ArrayList;
+import java.util.Vector;
 
 import javax.sound.sampled.AudioFormat;
 
@@ -25,7 +25,7 @@ import fr.delthas.javamp3.Mp3InputStream;
 @Deprecated
 public class AlMp3Buffer extends AlBuffer<IntBuffer> {
 
-	protected static final ArrayList<AlMp3Buffer> ALL_INSTANCES = new ArrayList<>();
+	protected static final Vector<AlMp3Buffer> ALL_INSTANCES = new Vector<>();
 
 	// region Constructors.
 	public AlMp3Buffer(final NerdAl p_alMan) {

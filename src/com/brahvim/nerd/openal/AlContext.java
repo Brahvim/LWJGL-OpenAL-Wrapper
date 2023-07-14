@@ -1,6 +1,7 @@
 package com.brahvim.nerd.openal;
 
 import java.util.ArrayList;
+import java.util.Vector;
 
 import org.lwjgl.openal.ALC10;
 import org.lwjgl.openal.ALC11;
@@ -28,7 +29,7 @@ public class AlContext extends AlNativeResource {
 	}
 
 	// region Fields.
-	protected static final ArrayList<AlContext> ALL_INSTANCES = new ArrayList<>();
+	protected static final Vector<AlContext> ALL_INSTANCES = new Vector<>();
 
 	private final NerdAl alMan;
 	private final AlDevice device;

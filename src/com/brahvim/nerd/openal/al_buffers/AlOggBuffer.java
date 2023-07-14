@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
-import java.util.ArrayList;
+import java.util.Vector;
 
 import org.lwjgl.openal.AL10;
 import org.lwjgl.stb.STBVorbis;
@@ -16,7 +16,7 @@ import com.brahvim.nerd.openal.NerdAl;
 
 public class AlOggBuffer extends AlBuffer<ShortBuffer> {
 
-	protected static final ArrayList<AlOggBuffer> ALL_INSTANCES = new ArrayList<>();
+	protected static final Vector<AlOggBuffer> ALL_INSTANCES = new Vector<>();
 
 	// region Constructors.
 	public AlOggBuffer(final NerdAl p_alMan) {

@@ -3,7 +3,7 @@ package com.brahvim.nerd.openal;
 import java.io.File;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import java.util.ArrayList;
+import java.util.Vector;
 
 import org.lwjgl.openal.AL;
 import org.lwjgl.openal.AL10;
@@ -53,7 +53,7 @@ public class NerdAl {
 	}
 	// endregion
 
-	// region Listener functions.
+	// region OpenAL listener manipulation.
 	// region C-style OpenAL listener getters.
 	public int getListenerInt(final long p_ctxId, final int p_alEnum) {
 		ALC10.alcMakeContextCurrent(p_ctxId);
@@ -220,47 +220,47 @@ public class NerdAl {
 	}
 
 	public float[] getListenerPosition() {
-		MemoryStack.stackPush();
-		final FloatBuffer floatBuffer = MemoryStack.stackMallocFloat(3);
+		// MemoryStack.stackPush();
+		final float[] floatArray = new float[3];
 		ALC10.alcMakeContextCurrent(this.DEFAULT_CONTEXT_ID);
 		this.checkAlcError();
 
 		if (this.context.hasDisposed)
 			return new float[0];
-		AL10.alGetListenerfv(AL10.AL_POSITION, floatBuffer);
-		MemoryStack.stackPop();
+		AL10.alGetListenerfv(AL10.AL_POSITION, floatArray);
+		// MemoryStack.stackPop();
 
-		return floatBuffer.array();
+		return floatArray;
 		// return new PVector(floatBuffer.get(), floatBuffer.get(), floatBuffer.get());
 	}
 
 	public float[] getListenerVelocity() {
-		MemoryStack.stackPush();
-		final FloatBuffer floatBuffer = MemoryStack.stackMallocFloat(3);
+		// MemoryStack.stackPush();
+		final float[] floatArray = new float[3];
 		ALC10.alcMakeContextCurrent(this.DEFAULT_CONTEXT_ID);
 		this.checkAlcError();
 
 		if (this.context.hasDisposed)
 			return new float[0];
-		AL10.alGetListenerfv(AL10.AL_VELOCITY, floatBuffer);
-		MemoryStack.stackPop();
+		AL10.alGetListenerfv(AL10.AL_VELOCITY, floatArray);
+		// MemoryStack.stackPop();
 
-		return floatBuffer.array();
+		return floatArray;
 		// return new PVector(floatBuffer.get(), floatBuffer.get(), floatBuffer.get());
 	}
 
 	public float[] getListenerOrientation() {
-		MemoryStack.stackPush();
-		final FloatBuffer floatBuffer = MemoryStack.stackMallocFloat(3);
+		// MemoryStack.stackPush();
+		final float[] floatArray = new float[3];
 		ALC10.alcMakeContextCurrent(this.DEFAULT_CONTEXT_ID);
 		this.checkAlcError();
 
 		if (this.context.hasDisposed)
 			return new float[0];
-		AL10.alGetListenerfv(AL10.AL_ORIENTATION, floatBuffer);
-		MemoryStack.stackPop();
+		AL10.alGetListenerfv(AL10.AL_ORIENTATION, floatArray);
+		// MemoryStack.stackPop();
 
-		return floatBuffer.array();
+		return floatArray;
 		// return new PVector(floatBuffer.get(), floatBuffer.get(), floatBuffer.get());
 	}
 	// endregion
@@ -407,8 +407,7 @@ public class NerdAl {
 	}
 	// endregion
 
-	// Only these three setters.
-	// region OpenAL API setters.
+	// region ...The three OpenAL API setters!
 	public void setDistanceModel(final int p_value) {
 		AL10.alDistanceModel(p_value);
 	}
@@ -501,7 +500,8 @@ public class NerdAl {
 
 	// region State management.
 	public void framelyCallback() {
-		this.device.disconnectionCheck();
+		AlSource.ALL_INSTANCES.removeAll(AlSource.INSTANCES_TO_REMOVE);
+		this.device.framelyCallback();
 
 		for (final AlSource s : AlSource.ALL_INSTANCES)
 			s.framelyCallback();
@@ -509,8 +509,10 @@ public class NerdAl {
 
 	@SuppressWarnings("deprecation")
 	public void scenelyDisposal() {
-		for (int listId = 0; listId != 6; listId++) {
-			final ArrayList<? extends AlNativeResource> list = switch (listId) {
+		// Remember the Cloudflare parser bug!
+		// Check the iterator's range, not its value, no matter the speed!:
+		for (int vectorId = 0; vectorId < 6; vectorId++) {
+			final Vector<? extends AlNativeResource> vector = switch (vectorId) {
 				case 0 -> AlCapture.ALL_INSTANCES;
 				case 1 -> AlFilter.ALL_INSTANCES;
 				case 2 -> AlEffect.ALL_INSTANCES;
@@ -520,19 +522,25 @@ public class NerdAl {
 				default -> null;
 			};
 
-			if (list == null)
+			if (vector == null)
 				continue;
 
-			for (int i = list.size() - 1; i > -1; i--)
-				list.get(i).dispose();
+			synchronized (vector) {
+				for (int i = vector.size() - 1; i > -1; i--)
+					vector.get(i).dispose();
+
+				vector.clear();
+			}
+
 		}
 	}
 
 	@SuppressWarnings("deprecation")
 	public void completeDisposal() {
-
-		for (int listId = 0; listId < 8; listId++) {
-			final ArrayList<? extends AlNativeResource> list = switch (listId) {
+		// Remember the Cloudflare parser bug!
+		// Check the iterator's range, not its value, no matter the speed!:
+		for (int vectorId = 0; vectorId < 8; vectorId++) {
+			final Vector<? extends AlNativeResource> vector = switch (vectorId) {
 				case 0 -> AlCapture.ALL_INSTANCES;
 				case 1 -> AlFilter.ALL_INSTANCES;
 				case 2 -> AlEffect.ALL_INSTANCES;
@@ -544,9 +552,16 @@ public class NerdAl {
 				default -> null;
 			};
 
-			if (list != null)
-				for (int i = list.size() - 1; i > -1; i--)
-					list.get(i).disposeForcibly();
+			if (vector == null)
+				continue;
+
+			synchronized (vector) {
+				for (int i = vector.size() - 1; i > -1; i--)
+					vector.get(i).disposeForcibly();
+
+				vector.clear();
+			}
+
 		}
 	}
 

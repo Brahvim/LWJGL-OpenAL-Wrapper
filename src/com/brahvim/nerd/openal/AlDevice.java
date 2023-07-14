@@ -3,6 +3,7 @@ package com.brahvim.nerd.openal;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 import java.util.function.Supplier;
 
 import org.lwjgl.openal.ALC10;
@@ -18,7 +19,7 @@ import com.brahvim.nerd.openal.al_exceptions.NerdAlException;
 public class AlDevice extends AlNativeResource {
 
 	// region Fields.
-	protected static final ArrayList<AlDevice> ALL_INSTANCES = new ArrayList<>();
+	protected static final Vector<AlDevice> ALL_INSTANCES = new Vector<>();
 
 	private long id;
 	private String name;
@@ -70,16 +71,18 @@ public class AlDevice extends AlNativeResource {
 		this.disconnectionCallback = p_callback;
 	}
 
-	// It's fine, let this be here:
-	public void disconnectionCheck() {
+	public void framelyCallback() {
+		this.resolveDisconnection();
+	}
+
+	private void resolveDisconnection() {
 		if (!this.isConnected())
 			this.changeEndpoint(this.disconnectionCallback.get());
 	}
 
 	public void changeEndpoint(final String p_dvName) {
-		if (!SOFTReopenDevice.alcReopenDeviceSOFT(
-				this.id, p_dvName, new int[] { 0 }))
-			throw new NerdAlException("`SOFTReopenDevice` failed.");
+		if (!SOFTReopenDevice.alcReopenDeviceSOFT(this.id, p_dvName, new int[] { 0 }))
+			throw new NerdAlException("`SOFTReopenDevice` failed...");
 		this.name = p_dvName;
 	}
 

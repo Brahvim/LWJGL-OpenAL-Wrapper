@@ -3,6 +3,7 @@ package com.brahvim.nerd.openal;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
+import java.util.Vector;
 
 import org.lwjgl.openal.AL10;
 import org.lwjgl.openal.EXTEfx;
@@ -78,7 +79,7 @@ public class AlAuxiliaryEffectSlot extends AlNativeResource {
 	 */
 
 	// region Fields.
-	protected static final ArrayList<AlAuxiliaryEffectSlot> ALL_INSTANCES = new ArrayList<>();
+	protected static final Vector<AlAuxiliaryEffectSlot> ALL_INSTANCES = new Vector<>();
 
 	private final NerdAl alMan;
 	private AlEffect effect;
