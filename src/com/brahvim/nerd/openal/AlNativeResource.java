@@ -3,14 +3,19 @@ package com.brahvim.nerd.openal;
 import java.util.ArrayList;
 import java.util.Vector;
 
-public abstract class AlNativeResource /* implements Closeable */ {
+public abstract class AlNativeResource<IdT extends Number> /* implements Closeable */ {
 
 	// region Fields and constructor.
+	protected final NerdAl MAN;
+
+	protected IdT id;
 	protected boolean hasDisposed, willDispose = true;
 
-	protected static Vector<AlNativeResource> ALL_INSTANCES = new Vector<>();
+	private static final Vector<AlNativeResource<?>> ALL_INSTANCES = new Vector<>(2);
 
-	protected AlNativeResource() {
+	protected AlNativeResource(final NerdAl p_alMan) {
+		this.MAN = p_alMan;
+		this.MAN.RESOURCES.add(this);
 		AlNativeResource.ALL_INSTANCES.add(this);
 	}
 	// endregion
@@ -20,13 +25,21 @@ public abstract class AlNativeResource /* implements Closeable */ {
 		return AlNativeResource.ALL_INSTANCES.size();
 	}
 
-	public static ArrayList<AlNativeResource> getResourcesCopy() {
+	public static ArrayList<AlNativeResource<?>> getResourcesCopy() {
 		return new ArrayList<>(AlNativeResource.ALL_INSTANCES);
 	}
 	// endregion
 
-	// Yes, there's no `getId()` method here.
-	// That's because OpenAL object IDs can be either of `long`s, or `int`s!
+	public IdT getId() {
+		return id;
+	}
+
+	public NerdAl getAlMan() {
+		return this.MAN;
+	}
+
+	protected void framelyCallback() {
+	}
 
 	public final boolean isDisposed() {
 		return this.hasDisposed;
@@ -51,8 +64,10 @@ public abstract class AlNativeResource /* implements Closeable */ {
 		if (this.hasDisposed)
 			return;
 
-		this.hasDisposed = true;
 		this.disposeImpl();
+		this.hasDisposed = true;
+		this.MAN.RESOURCES.remove(this);
+		AlNativeResource.ALL_INSTANCES.remove(this);
 	}
 
 	protected abstract void disposeImpl();

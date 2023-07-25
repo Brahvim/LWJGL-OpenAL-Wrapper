@@ -23,7 +23,7 @@ import com.brahvim.nerd.openal.al_ext_efx.al_effects.AlPitchShifter;
 import com.brahvim.nerd.openal.al_ext_efx.al_effects.AlReverb;
 import com.brahvim.nerd.openal.al_ext_efx.al_effects.AlRingModulator;
 
-public class AlAuxiliaryEffectSlot extends AlNativeResource {
+public class AlAuxiliaryEffectSlot extends AlNativeResource<Integer> {
 
 	/*
 	 * let arr = [
@@ -81,24 +81,22 @@ public class AlAuxiliaryEffectSlot extends AlNativeResource {
 	// region Fields.
 	protected static final Vector<AlAuxiliaryEffectSlot> ALL_INSTANCES = new Vector<>();
 
-	private final NerdAl alMan;
 	private AlEffect effect;
 	private AlSource source;
-	private int id = EXTEfx.AL_EFFECT_NULL;
 	// endregion
 
 	// region Constructors.
 	public AlAuxiliaryEffectSlot(final NerdAl p_alMan) {
-		this.alMan = p_alMan;
-		this.id = EXTEfx.alGenAuxiliaryEffectSlots();
-		this.alMan.checkAlError();
+		super(p_alMan);
+		super.id = EXTEfx.alGenAuxiliaryEffectSlots();
+		super.MAN.checkAlError();
 		AlAuxiliaryEffectSlot.ALL_INSTANCES.add(this);
 	}
 
 	public AlAuxiliaryEffectSlot(final NerdAl p_alMan, final AlEffect p_effect) {
-		this.alMan = p_alMan;
-		this.id = EXTEfx.alGenAuxiliaryEffectSlots();
-		this.alMan.checkAlError();
+		super(p_alMan);
+		super.id = EXTEfx.alGenAuxiliaryEffectSlots();
+		super.MAN.checkAlError();
 
 		this.setEffect(p_effect);
 		AlAuxiliaryEffectSlot.ALL_INSTANCES.add(this);
@@ -116,10 +114,6 @@ public class AlAuxiliaryEffectSlot extends AlNativeResource {
 	// endregion
 
 	// region Getters.
-	public int getId() {
-		return this.id;
-	}
-
 	public float getGain() {
 		return this.getFloat(EXTEfx.AL_EFFECTSLOT_GAIN);
 	}
@@ -130,17 +124,17 @@ public class AlAuxiliaryEffectSlot extends AlNativeResource {
 
 	@SuppressWarnings("unchecked")
 	public <T extends AlEffect> T getEffect() {
-		final int ID = this.getInt(EXTEfx.AL_EFFECTSLOT_EFFECT);
+		final int id = this.getInt(EXTEfx.AL_EFFECTSLOT_EFFECT);
 
-		if (ID == this.effect.id)
+		if (id == this.effect.id)
 			return (T) this.effect;
 		else
 			for (final AlEffect e : AlEffect.ALL_INSTANCES) {
-				if (e.id == ID)
+				if (e.id == id)
 					return (T) e;
 			}
 
-		final int EFFECT_TYPE = EXTEfx.alGetEffecti(ID, EXTEfx.AL_EFFECTSLOT_EFFECT);
+		final int effectType = EXTEfx.alGetEffecti(id, EXTEfx.AL_EFFECTSLOT_EFFECT);
 
 		// region Construct new effect according to `EFFECT_TYPE`.
 		// The JS code that generated the next part. Hee-hee!:
@@ -209,53 +203,53 @@ public class AlAuxiliaryEffectSlot extends AlNativeResource {
 		 * }
 		 */
 
-		if (EFFECT_TYPE == EXTEfx.AL_EFFECT_EAXREVERB)
-			return (T) new AlEaxReverb(this.alMan);
+		if (effectType == EXTEfx.AL_EFFECT_EAXREVERB)
+			return (T) new AlEaxReverb(super.MAN);
 
-		else if (EFFECT_TYPE == EXTEfx.AL_EFFECT_REVERB)
-			return (T) new AlReverb(this.alMan);
+		else if (effectType == EXTEfx.AL_EFFECT_REVERB)
+			return (T) new AlReverb(super.MAN);
 
-		else if (EFFECT_TYPE == EXTEfx.AL_EFFECT_CHORUS)
-			return (T) new AlChorus(this.alMan);
+		else if (effectType == EXTEfx.AL_EFFECT_CHORUS)
+			return (T) new AlChorus(super.MAN);
 
-		else if (EFFECT_TYPE == EXTEfx.AL_EFFECT_DISTORTION)
-			return (T) new AlDistortion(this.alMan);
+		else if (effectType == EXTEfx.AL_EFFECT_DISTORTION)
+			return (T) new AlDistortion(super.MAN);
 
-		else if (EFFECT_TYPE == EXTEfx.AL_EFFECT_ECHO)
-			return (T) new AlEcho(this.alMan);
+		else if (effectType == EXTEfx.AL_EFFECT_ECHO)
+			return (T) new AlEcho(super.MAN);
 
-		else if (EFFECT_TYPE == EXTEfx.AL_EFFECT_FLANGER)
-			return (T) new AlFlanger(this.alMan);
+		else if (effectType == EXTEfx.AL_EFFECT_FLANGER)
+			return (T) new AlFlanger(super.MAN);
 
-		else if (EFFECT_TYPE == EXTEfx.AL_EFFECT_FREQUENCY_SHIFTER)
-			return (T) new AlFrequencyShifter(this.alMan);
+		else if (effectType == EXTEfx.AL_EFFECT_FREQUENCY_SHIFTER)
+			return (T) new AlFrequencyShifter(super.MAN);
 
-		else if (EFFECT_TYPE == EXTEfx.AL_EFFECT_VOCAL_MORPHER) {
+		else if (effectType == EXTEfx.AL_EFFECT_VOCAL_MORPHER) {
 			System.err.println(
 					"LWJGL has not yet implemented `AL_VOCAL_MORPHER`, sorry.");
 			// `return (T) new AlVocalMorpher();`
-			return (T) new AlEffect(this.alMan) {
+			return (T) new AlEffect(super.MAN) {
 				@Override
 				protected int getEffectType() {
-					return EFFECT_TYPE;
+					return effectType;
 				}
 			};
 		}
 
-		else if (EFFECT_TYPE == EXTEfx.AL_EFFECT_PITCH_SHIFTER)
-			return (T) new AlPitchShifter(this.alMan);
+		else if (effectType == EXTEfx.AL_EFFECT_PITCH_SHIFTER)
+			return (T) new AlPitchShifter(super.MAN);
 
-		else if (EFFECT_TYPE == EXTEfx.AL_EFFECT_RING_MODULATOR)
-			return (T) new AlRingModulator(this.alMan);
+		else if (effectType == EXTEfx.AL_EFFECT_RING_MODULATOR)
+			return (T) new AlRingModulator(super.MAN);
 
-		else if (EFFECT_TYPE == EXTEfx.AL_EFFECT_AUTOWAH)
-			return (T) new AlAutowah(this.alMan);
+		else if (effectType == EXTEfx.AL_EFFECT_AUTOWAH)
+			return (T) new AlAutowah(super.MAN);
 
-		else if (EFFECT_TYPE == EXTEfx.AL_EFFECT_COMPRESSOR)
-			return (T) new AlCompressor(this.alMan);
+		else if (effectType == EXTEfx.AL_EFFECT_COMPRESSOR)
+			return (T) new AlCompressor(super.MAN);
 
-		else if (EFFECT_TYPE == EXTEfx.AL_EFFECT_EQUALIZER)
-			return (T) new AlEqualizer(this.alMan);
+		else if (effectType == EXTEfx.AL_EFFECT_EQUALIZER)
+			return (T) new AlEqualizer(super.MAN);
 
 		// Instead of throwing this exception, I could just use reflection to see
 		// what classes extend `AlEffect` with the assumption that the default
@@ -285,18 +279,18 @@ public class AlAuxiliaryEffectSlot extends AlNativeResource {
 
 		if (p_effect == null) {
 			this.effect = null;
-			EXTEfx.alAuxiliaryEffectSloti(this.id, EXTEfx.AL_EFFECTSLOT_EFFECT, EXTEfx.AL_EFFECT_NULL);
+			EXTEfx.alAuxiliaryEffectSloti(super.id, EXTEfx.AL_EFFECTSLOT_EFFECT, EXTEfx.AL_EFFECT_NULL);
 			return toRet;
 		}
 
 		this.effect = p_effect;
 		this.effect.slot = this;
-		EXTEfx.alAuxiliaryEffectSloti(this.id, EXTEfx.AL_EFFECTSLOT_EFFECT, p_effect.id);
+		EXTEfx.alAuxiliaryEffectSloti(super.id, EXTEfx.AL_EFFECTSLOT_EFFECT, p_effect.id);
 		return toRet;
 	}
 
 	public AlAuxiliaryEffectSlot setAutoSend(final boolean p_value) {
-		EXTEfx.alAuxiliaryEffectSloti(this.id, EXTEfx.AL_EFFECTSLOT_AUXILIARY_SEND_AUTO,
+		EXTEfx.alAuxiliaryEffectSloti(super.id, EXTEfx.AL_EFFECTSLOT_AUXILIARY_SEND_AUTO,
 				p_value ? AL10.AL_TRUE : AL10.AL_FALSE);
 		return this;
 	}
@@ -310,10 +304,10 @@ public class AlAuxiliaryEffectSlot extends AlNativeResource {
 		if (super.hasDisposed)
 			return Integer.MIN_VALUE;
 
-		EXTEfx.alGetAuxiliaryEffectSloti(this.id, p_alEnum, buffer);
+		EXTEfx.alGetAuxiliaryEffectSloti(super.id, p_alEnum, buffer);
 
 		MemoryStack.stackPop();
-		this.alMan.checkAlError();
+		super.MAN.checkAlError();
 
 		return buffer.get();
 	}
@@ -325,10 +319,10 @@ public class AlAuxiliaryEffectSlot extends AlNativeResource {
 		if (super.hasDisposed)
 			return new int[0];
 
-		EXTEfx.alGetAuxiliaryEffectSlotiv(this.id, p_alEnum, buffer);
+		EXTEfx.alGetAuxiliaryEffectSlotiv(super.id, p_alEnum, buffer);
 
 		MemoryStack.stackPop();
-		this.alMan.checkAlError();
+		super.MAN.checkAlError();
 
 		return buffer.array();
 	}
@@ -340,10 +334,10 @@ public class AlAuxiliaryEffectSlot extends AlNativeResource {
 		if (super.hasDisposed)
 			return -Float.MAX_VALUE;
 
-		EXTEfx.alGetAuxiliaryEffectSlotf(this.id, p_alEnum, buffer);
+		EXTEfx.alGetAuxiliaryEffectSlotf(super.id, p_alEnum, buffer);
 
 		MemoryStack.stackPop();
-		this.alMan.checkAlError();
+		super.MAN.checkAlError();
 
 		return buffer.get();
 	}
@@ -355,10 +349,10 @@ public class AlAuxiliaryEffectSlot extends AlNativeResource {
 		if (super.hasDisposed)
 			return new float[0];
 
-		EXTEfx.alGetAuxiliaryEffectSlotfv(this.id, p_alEnum, buffer);
+		EXTEfx.alGetAuxiliaryEffectSlotfv(super.id, p_alEnum, buffer);
 
 		MemoryStack.stackPop();
-		this.alMan.checkAlError();
+		super.MAN.checkAlError();
 
 		return buffer.array();
 	}
@@ -366,23 +360,23 @@ public class AlAuxiliaryEffectSlot extends AlNativeResource {
 
 	// region C-style OpenAL setters.
 	public void setInt(final int p_alEnum, final int p_value) {
-		EXTEfx.alAuxiliaryEffectSloti(this.id, p_alEnum, p_value);
-		this.alMan.checkAlError();
+		EXTEfx.alAuxiliaryEffectSloti(super.id, p_alEnum, p_value);
+		super.MAN.checkAlError();
 	}
 
 	public void setIntVector(final int p_alEnum, final int... p_values) {
-		EXTEfx.alAuxiliaryEffectSlotiv(this.id, p_alEnum, p_values);
-		this.alMan.checkAlError();
+		EXTEfx.alAuxiliaryEffectSlotiv(super.id, p_alEnum, p_values);
+		super.MAN.checkAlError();
 	}
 
 	public void setFloat(final int p_alEnum, final float p_value) {
-		EXTEfx.alAuxiliaryEffectSlotf(this.id, p_alEnum, p_value);
-		this.alMan.checkAlError();
+		EXTEfx.alAuxiliaryEffectSlotf(super.id, p_alEnum, p_value);
+		super.MAN.checkAlError();
 	}
 
 	public void setFloatVector(final int p_alEnum, final float... p_values) {
-		EXTEfx.alAuxiliaryEffectSlotfv(this.id, p_alEnum, p_values);
-		this.alMan.checkAlError();
+		EXTEfx.alAuxiliaryEffectSlotfv(super.id, p_alEnum, p_values);
+		super.MAN.checkAlError();
 	}
 	// endregion
 
@@ -390,8 +384,10 @@ public class AlAuxiliaryEffectSlot extends AlNativeResource {
 	protected void disposeImpl() {
 		this.setEffect(null);
 		this.source.setEffectSlot(null);
-		EXTEfx.alDeleteAuxiliaryEffectSlots(this.id);
+		EXTEfx.alDeleteAuxiliaryEffectSlots(super.id);
 		AlAuxiliaryEffectSlot.ALL_INSTANCES.remove(this);
+
+		super.id = EXTEfx.AL_EFFECTSLOT_NULL;
 	}
 
 }

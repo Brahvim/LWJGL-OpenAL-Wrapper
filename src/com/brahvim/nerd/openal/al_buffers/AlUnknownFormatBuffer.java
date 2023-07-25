@@ -9,18 +9,18 @@ import org.lwjgl.openal.AL10;
 import com.brahvim.nerd.openal.AlBuffer;
 import com.brahvim.nerd.openal.NerdAl;
 
-public class AlNoTypeBuffer extends AlBuffer<Buffer> {
+public class AlUnknownFormatBuffer extends AlBuffer<Buffer> {
 
 	// region Constructors.
-	public AlNoTypeBuffer(final NerdAl p_alMan) {
+	public AlUnknownFormatBuffer(final NerdAl p_alMan) {
 		super(p_alMan);
 	}
 
-	public AlNoTypeBuffer(final AlBuffer<?> p_buffer) {
+	public AlUnknownFormatBuffer(final AlBuffer<?> p_buffer) {
 		super(p_buffer);
 	}
 
-	public AlNoTypeBuffer(final NerdAl p_alMan, final int p_id) {
+	public AlUnknownFormatBuffer(final NerdAl p_alMan, final int p_id) {
 		super(p_alMan, p_id);
 	}
 	// endregion
@@ -40,7 +40,7 @@ public class AlNoTypeBuffer extends AlBuffer<Buffer> {
 
 	@Override
 	protected void setDataImpl(final int p_format, final Buffer p_buffer, final int p_sampleRate) {
-		AL10.alBufferData(this.id, p_format, (ByteBuffer) p_buffer, p_sampleRate);
+		AL10.alBufferData(super.id, p_format, (ByteBuffer) p_buffer, p_sampleRate);
 	}
 
 }

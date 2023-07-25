@@ -29,55 +29,55 @@ public class AlBufferStream {
 	// region Fields.
 	protected static final Vector<AlBufferStream> ALL_INSTANCES = new Vector<>();
 
-	private final NerdAl alMan;
-	private final AlSource source;
-	private final ArrayList<AlOggBuffer> buffers = new ArrayList<>(3), unusedBuffersPool = new ArrayList<>(5);
+	private final NerdAl MAN;
+	private final AlSource SOURCE;
+	private final ArrayList<AlOggBuffer> USED_BUFFERS = new ArrayList<>(3), UNUSED_BUFFERS = new ArrayList<>(5);
 	// endregion
 
 	public AlBufferStream(final NerdAl p_alMan, final AlSource p_source) {
-		this.alMan = p_alMan;
-		this.source = p_source;
+		this.MAN = p_alMan;
+		this.SOURCE = p_source;
 		AlBufferStream.ALL_INSTANCES.add(this);
 	}
 
 	public synchronized void addBytes(final int p_alFormat, final byte[] p_bytes, final int p_sampleRate) {
 		// This is fine - `ArrayList`s don't decrease their size anyway.
-		if (this.unusedBuffersPool.isEmpty())
-			this.unusedBuffersPool.add(new AlOggBuffer(this.alMan));
+		if (this.UNUSED_BUFFERS.isEmpty())
+			this.UNUSED_BUFFERS.add(new AlOggBuffer(this.MAN));
 
-		final AlOggBuffer toQueue = this.unusedBuffersPool.remove(0);
-		toQueue.setData(p_alFormat, ByteBuffer.wrap(p_bytes)
-				.order(ByteOrder.nativeOrder()).asShortBuffer(),
+		final AlOggBuffer toQueue = this.UNUSED_BUFFERS.remove(0);
+		toQueue.setData(p_alFormat,
+				ByteBuffer.wrap(p_bytes).order(ByteOrder.nativeOrder()).asShortBuffer(),
 				p_sampleRate);
-		this.source.queueBuffers(toQueue);
-		this.alMan.checkAlError();
-		this.buffers.add(toQueue);
+		this.SOURCE.queueBuffers(toQueue);
+		this.MAN.checkAlError();
+		this.USED_BUFFERS.add(toQueue);
 	}
 
 	// Yo! Saw this class in the stack trace?
 	// ...you might wanna check out the loop in this method!:
-	protected void framelyCallback() {
+	protected synchronized void framelyCallback() {
 		// For each buffer (backwards),
-		for (int i = this.source.getBuffersProcessed() - 1; i != 0; i--) {
-			final AlOggBuffer b = this.buffers.get(i);
-			this.source.unqueueBuffers(b); // ..Tell the source to unqueue it,
-			this.alMan.checkAlError();
-			this.unusedBuffersPool.add(this.buffers.remove(i)); // ..And add it to our pool!
+		for (int i = this.SOURCE.getBuffersProcessed() - 1; i != 0; i--) {
+			final AlOggBuffer b = this.USED_BUFFERS.get(i);
+			this.SOURCE.unqueueBuffers(b); // ..Tell the source to unqueue it,
+			this.MAN.checkAlError();
+			this.UNUSED_BUFFERS.add(this.USED_BUFFERS.remove(i)); // ..And add it to our pool!
 		}
 	}
 
 	public synchronized void stop() {
 		// Page `14` of the "OpenAL Programmer's Guide" mentions this
 		// nice shortcut to remove all attached buffers from a source:
-		this.source.setInt(AL10.AL_BUFFER, 0);
-		this.alMan.checkAlError();
+		this.SOURCE.setInt(AL10.AL_BUFFER, 0);
+		this.MAN.checkAlError();
 
 		// Should I actually be doing this...?
-		this.alMan.checkAlError();
+		this.MAN.checkAlError();
 	}
 
 	public ArrayList<AlOggBuffer> getAlBuffers() {
-		return new ArrayList<>(this.buffers);
+		return new ArrayList<>(this.USED_BUFFERS);
 	}
 
 }

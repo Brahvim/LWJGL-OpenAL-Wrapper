@@ -16,14 +16,12 @@ import org.lwjgl.system.MemoryStack;
 import com.brahvim.nerd.openal.al_exceptions.AlcException;
 import com.brahvim.nerd.openal.al_exceptions.NerdAlException;
 
-public class AlDevice extends AlNativeResource {
+public class AlDevice extends AlNativeResource<Long> {
 
 	// region Fields.
 	protected static final Vector<AlDevice> ALL_INSTANCES = new Vector<>();
 
-	private long id;
 	private String name;
-	private final NerdAl alMan;
 	private Supplier<String> disconnectionCallback = AlDevice::getDefaultDeviceName;
 	// endregion
 
@@ -33,16 +31,16 @@ public class AlDevice extends AlNativeResource {
 	}
 
 	public AlDevice(final NerdAl p_alMan, final String p_deviceName) {
+		super(p_alMan);
 		AlDevice.ALL_INSTANCES.add(this);
 
-		this.alMan = p_alMan;
 		this.name = p_deviceName;
-		this.id = ALC10.alcOpenDevice(this.name);
+		super.id = ALC10.alcOpenDevice(this.name);
 
 		// Check for errors here because we can't call `NerdAl::checkAlcError()` yet:
-		final int alcError = ALC10.alcGetError(this.id);
+		final int alcError = ALC10.alcGetError(super.id);
 		if (alcError != 0)
-			throw new AlcException(this.id, alcError);
+			throw new AlcException(super.id, alcError);
 	}
 	// endregion
 
@@ -71,6 +69,7 @@ public class AlDevice extends AlNativeResource {
 		this.disconnectionCallback = p_callback;
 	}
 
+	@Override
 	public void framelyCallback() {
 		this.resolveDisconnection();
 	}
@@ -81,7 +80,7 @@ public class AlDevice extends AlNativeResource {
 	}
 
 	public void changeEndpoint(final String p_dvName) {
-		if (!SOFTReopenDevice.alcReopenDeviceSOFT(this.id, p_dvName, new int[] { 0 }))
+		if (!SOFTReopenDevice.alcReopenDeviceSOFT(super.id, p_dvName, new int[] { 0 }))
 			throw new NerdAlException("`SOFTReopenDevice` failed...");
 		this.name = p_dvName;
 	}
@@ -91,7 +90,7 @@ public class AlDevice extends AlNativeResource {
 		// No idea why this bad stack read works.
 		MemoryStack.stackPush();
 		final IntBuffer buffer = MemoryStack.stackMallocInt(1); // Stack allocation, "should" be "faster".
-		ALC10.alcGetIntegerv(this.id, EXTDisconnect.ALC_CONNECTED, buffer);
+		ALC10.alcGetIntegerv(super.id, EXTDisconnect.ALC_CONNECTED, buffer);
 		MemoryStack.stackPop();
 
 		return buffer.get() == 1;
@@ -99,16 +98,13 @@ public class AlDevice extends AlNativeResource {
 	// endregion
 
 	// region Getters (and the `isDefault()` query).
-	public long getId() {
-		return this.id;
-	}
-
 	public String getName() {
 		return this.name;
 	}
 
+	@Override
 	public NerdAl getAlMan() {
-		return this.alMan;
+		return super.MAN;
 	}
 
 	// I don't want to hold a `boolean` for this...
@@ -119,11 +115,11 @@ public class AlDevice extends AlNativeResource {
 
 	@Override
 	protected void disposeImpl() {
-		if (!ALC10.alcCloseDevice(this.id))
+		if (!ALC10.alcCloseDevice(super.id))
 			throw new NerdAlException("Could not close OpenAL device!");
 
-		this.id = 0;
-		// this.alMan.checkAlcErrors();
+		super.id = 0L;
+		// super.MAN.checkAlcErrors();
 		AlDevice.ALL_INSTANCES.remove(this);
 	}
 

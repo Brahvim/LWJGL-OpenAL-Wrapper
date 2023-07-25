@@ -5,6 +5,7 @@ import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Vector;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.lwjgl.openal.AL10;
 import org.lwjgl.openal.ALC10;
@@ -14,10 +15,11 @@ import com.brahvim.nerd.openal.al_buffers.AlWavBuffer;
 import com.brahvim.nerd.openal.al_exceptions.AlcException;
 
 /**
- * @deprecated I really can't see how one records audio with OpenAL.
+ * @deprecated I don't yet understand how one records audio with OpenAL. Need to
+ *             read, the docs!
  */
 @Deprecated
-public class AlCapture extends AlNativeResource {
+public class AlCapture extends AlNativeResource<Long> {
 
 	// Y'know what?
 	// Using different OpenAL contexts probably doesn't matter here.
@@ -25,14 +27,11 @@ public class AlCapture extends AlNativeResource {
 	// region Fields.
 	protected static final Vector<AlCapture> ALL_INSTANCES = new Vector<>();
 
-	private static int numInstances;
-
 	// This is here literally just for naming threads!:
-	private static volatile int numActiveInstances;
+	private static AtomicInteger numActiveInstances = new AtomicInteger();
 
-	private long id;
-	private final NerdAl alMan;
 	private final String deviceName;
+
 	private Thread captureThread;
 	private ByteBuffer capturedData = ByteBuffer.allocate(0);
 
@@ -47,7 +46,7 @@ public class AlCapture extends AlNativeResource {
 	}
 
 	public AlCapture(final NerdAl p_alMan, final String p_deviceName) {
-		this.alMan = p_alMan;
+		super(p_alMan);
 		this.deviceName = p_deviceName;
 		AlCapture.ALL_INSTANCES.add(this);
 	}
@@ -59,11 +58,11 @@ public class AlCapture extends AlNativeResource {
 	}
 
 	public static int getNumInstances() {
-		return AlCapture.numInstances;
+		return AlCapture.ALL_INSTANCES.size();
 	}
 
 	public static int getNumInstancesCurrentlyCapturing() {
-		return AlCapture.numActiveInstances;
+		return AlCapture.numActiveInstances.get();
 	}
 	// endregion
 
@@ -91,7 +90,7 @@ public class AlCapture extends AlNativeResource {
 			return;
 		}
 
-		AlCapture.numActiveInstances++;
+		AlCapture.numActiveInstances.incrementAndGet();
 
 		// region Preparing to capture.
 		// Store the last ones.
@@ -99,12 +98,12 @@ public class AlCapture extends AlNativeResource {
 		this.lastCapSampleRate = p_sampleRate;
 
 		// Open the capture device,
-		this.id = ALC11.alcCaptureOpenDevice(this.deviceName, p_sampleRate, p_format, p_samplesPerBuffer);
-		this.alMan.checkAlcError();
+		super.id = ALC11.alcCaptureOpenDevice(this.deviceName, p_sampleRate, p_format, p_samplesPerBuffer);
+		super.MAN.checkAlcError();
 
 		// Begin capturing!:
-		ALC11.alcCaptureStart(this.id);
-		this.alMan.checkAlcError();
+		ALC11.alcCaptureStart(super.id);
+		super.MAN.checkAlcError();
 		// endregion
 
 		this.captureThread = new Thread(() -> {
@@ -113,19 +112,19 @@ public class AlCapture extends AlNativeResource {
 
 			// Capture till `stopCapturing()` is called:
 			while (!Thread.interrupted()) {
-				this.alMan.checkAlcError();
+				super.MAN.checkAlcError();
 
 				final ByteBuffer SAMPLES_BUFFER = ByteBuffer.allocate(p_samplesPerBuffer);
 
-				// for (int i = 0; i < p_samplesPerBuffer; i = ALC10.alcGetInteger(this.id,
+				// for (int i = 0; i < p_samplesPerBuffer; i = ALC10.alcGetInteger(super.id,
 				// ALC11.ALC_CAPTURE_SAMPLES))
 				// System.out.printf("Captured `%d` samples.\n", i);
 
-				ALC11.alcCaptureSamples(this.id, SAMPLES_BUFFER, p_samplesPerBuffer);
+				ALC11.alcCaptureSamples(super.id, SAMPLES_BUFFER, p_samplesPerBuffer);
 
 				// region Check if the device gets disconnected (cause of `ALC_INVALID_DEVICE`):
 				try {
-					this.alMan.checkAlcError();
+					super.MAN.checkAlcError();
 				} catch (final AlcException e) {
 					deviceGotRemoved = true;
 					System.err.printf("""
@@ -145,7 +144,7 @@ public class AlCapture extends AlNativeResource {
 			// When interrupted, stop capturing:
 			synchronized (this) {
 				if (deviceGotRemoved)
-					ALC11.alcCaptureStop(this.id);
+					ALC11.alcCaptureStop(super.id);
 				this.capturedData = dataCaptured;
 			}
 		});
@@ -176,10 +175,10 @@ public class AlCapture extends AlNativeResource {
 
 		this.captureThread.interrupt();
 
-		ALC11.alcCaptureCloseDevice(this.id);
-		this.alMan.checkAlcError();
+		ALC11.alcCaptureCloseDevice(super.id);
+		super.MAN.checkAlcError();
 
-		AlCapture.numActiveInstances--;
+		AlCapture.numActiveInstances.decrementAndGet();
 		return this.capturedData;
 	}
 	// endregion
@@ -203,7 +202,7 @@ public class AlCapture extends AlNativeResource {
 	}
 
 	public AlWavBuffer storeIntoBuffer() {
-		final AlWavBuffer toRet = new AlWavBuffer(this.alMan);
+		final AlWavBuffer toRet = new AlWavBuffer(super.MAN);
 		toRet.setData(this.lastCapFormat,
 				this.capturedData.order(ByteOrder.nativeOrder()).asIntBuffer(),
 				this.lastCapSampleRate);
@@ -213,7 +212,7 @@ public class AlCapture extends AlNativeResource {
 
 	@Override
 	protected void disposeImpl() {
-		ALC11.alcCaptureCloseDevice(this.id);
+		ALC11.alcCaptureCloseDevice(super.id);
 		AlCapture.ALL_INSTANCES.remove(this);
 	}
 

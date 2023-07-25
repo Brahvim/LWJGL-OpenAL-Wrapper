@@ -52,7 +52,7 @@ public class AlMp3Buffer extends AlBuffer<IntBuffer> {
 
 	@Override
 	protected void setDataImpl(final int p_format, final IntBuffer p_buffer, final int p_sampleRate) {
-		AL10.alBufferData(this.id, p_format, p_buffer, p_sampleRate);
+		AL10.alBufferData(super.id, p_format, p_buffer, p_sampleRate);
 	}
 
 	@Override
@@ -79,7 +79,7 @@ public class AlMp3Buffer extends AlBuffer<IntBuffer> {
 		if (format == null)
 			return null;
 
-		AL10.alBufferData(this.id,
+		AL10.alBufferData(super.id,
 				super.alFormat = format.getChannels() == 1
 						? AL10.AL_FORMAT_MONO16
 						: AL10.AL_FORMAT_STEREO16,

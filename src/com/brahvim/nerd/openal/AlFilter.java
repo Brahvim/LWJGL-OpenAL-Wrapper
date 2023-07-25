@@ -8,25 +8,23 @@ import java.util.Vector;
 import org.lwjgl.openal.EXTEfx;
 import org.lwjgl.system.MemoryStack;
 
-public abstract class AlFilter extends AlNativeResource {
+public abstract class AlFilter extends AlNativeResource<Integer> {
 
-	// region Fields.
 	protected static final Vector<AlFilter> ALL_INSTANCES = new Vector<>();
 
-	private final int id;
-	private final NerdAl alMan;
-	// endregion
-
 	protected AlFilter(final NerdAl p_alMan) {
+		super(p_alMan);
 		AlFilter.ALL_INSTANCES.add(this);
+		super.MAN.RESOURCES.add(this);
 
-		this.alMan = p_alMan;
-		this.id = EXTEfx.alGenFilters();
-		this.alMan.checkAlError();
+		super.id = EXTEfx.alGenFilters();
+		super.MAN.checkAlError();
 
 		this.setInt(EXTEfx.AL_FILTER_TYPE, this.getName());
-		this.alMan.checkAlError();
+		super.MAN.checkAlError();
 	}
+
+	public abstract int getName();
 
 	// region Instance collection queries.
 	public static int getNumInstances() {
@@ -46,10 +44,10 @@ public abstract class AlFilter extends AlNativeResource {
 		if (super.hasDisposed)
 			return Integer.MIN_VALUE;
 
-		EXTEfx.alGetFilteri(this.id, p_alEnum, buffer);
+		EXTEfx.alGetFilteri(super.id, p_alEnum, buffer);
 
 		MemoryStack.stackPop();
-		this.alMan.checkAlError();
+		super.MAN.checkAlError();
 
 		return buffer.get();
 	}
@@ -61,10 +59,10 @@ public abstract class AlFilter extends AlNativeResource {
 		if (super.hasDisposed)
 			return new int[0];
 
-		EXTEfx.alGetFilteriv(this.id, p_alEnum, buffer);
+		EXTEfx.alGetFilteriv(super.id, p_alEnum, buffer);
 
 		MemoryStack.stackPop();
-		this.alMan.checkAlError();
+		super.MAN.checkAlError();
 
 		return buffer.array();
 	}
@@ -76,10 +74,10 @@ public abstract class AlFilter extends AlNativeResource {
 		if (super.hasDisposed)
 			return -Float.MAX_VALUE;
 
-		EXTEfx.alGetFilterf(this.id, p_alEnum, buffer);
+		EXTEfx.alGetFilterf(super.id, p_alEnum, buffer);
 
 		MemoryStack.stackPop();
-		this.alMan.checkAlError();
+		super.MAN.checkAlError();
 
 		return buffer.get();
 	}
@@ -91,10 +89,10 @@ public abstract class AlFilter extends AlNativeResource {
 		if (super.hasDisposed)
 			return new float[0];
 
-		EXTEfx.alGetFilterfv(this.id, p_alEnum, buffer);
+		EXTEfx.alGetFilterfv(super.id, p_alEnum, buffer);
 
 		MemoryStack.stackPop();
-		this.alMan.checkAlError();
+		super.MAN.checkAlError();
 
 		return buffer.array();
 	}
@@ -102,46 +100,37 @@ public abstract class AlFilter extends AlNativeResource {
 
 	// region C-style OpenAL setters.
 	public void setInt(final int p_alEnum, final int p_value) {
-		EXTEfx.alFilteri(this.id, p_alEnum, p_value);
-		this.alMan.checkAlError();
+		EXTEfx.alFilteri(super.id, p_alEnum, p_value);
+		super.MAN.checkAlError();
 	}
 
 	public void setIntVector(final int p_alEnum, final int... p_values) {
-		EXTEfx.alFilteriv(this.id, p_alEnum, p_values);
-		this.alMan.checkAlError();
+		EXTEfx.alFilteriv(super.id, p_alEnum, p_values);
+		super.MAN.checkAlError();
 	}
 
 	public void setFloat(final int p_alEnum, final float p_value) {
-		EXTEfx.alFilterf(this.id, p_alEnum, p_value);
-		this.alMan.checkAlError();
+		EXTEfx.alFilterf(super.id, p_alEnum, p_value);
+		super.MAN.checkAlError();
 	}
 
 	public void setFloatVector(final int p_alEnum, final float... p_values) {
-		EXTEfx.alFilterfv(this.id, p_alEnum, p_values);
-		this.alMan.checkAlError();
+		EXTEfx.alFilterfv(super.id, p_alEnum, p_values);
+		super.MAN.checkAlError();
 	}
-	// endregion
-
-	// region Getters.
-	public int getId() {
-		return this.id;
-	}
-
-	public abstract int getName();
 	// endregion
 
 	// region Mass source attachment.
 	public void attachToSources(final int p_filterType, final AlSource... p_sources) {
-		if (p_filterType == EXTEfx.AL_DIRECT_FILTER)
-			for (final AlSource s : p_sources) {
+		if (p_filterType == EXTEfx.AL_DIRECT_FILTER) {
+			for (final AlSource s : p_sources)
 				if (s != null)
 					s.attachDirectFilter(this);
-			}
-		else
-			for (final AlSource s : p_sources) {
+		} else {
+			for (final AlSource s : p_sources)
 				if (s != null)
 					s.attachAuxiliarySendFilter(this);
-			}
+		}
 	}
 
 	public void detachFromSources(final int p_filterType, final AlSource... p_sources) {
@@ -160,7 +149,7 @@ public abstract class AlFilter extends AlNativeResource {
 
 	@Override
 	protected void disposeImpl() {
-		EXTEfx.alDeleteFilters(this.id);
+		EXTEfx.alDeleteFilters(super.id);
 		AlFilter.ALL_INSTANCES.remove(this);
 	}
 

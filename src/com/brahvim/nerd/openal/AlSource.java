@@ -9,30 +9,26 @@ import java.util.Vector;
 
 import org.lwjgl.openal.AL10;
 import org.lwjgl.openal.AL11;
-import org.lwjgl.openal.ALC10;
 import org.lwjgl.openal.EXTEfx;
 import org.lwjgl.system.MemoryStack;
 
-import com.brahvim.nerd.openal.al_buffers.AlNoTypeBuffer;
+import com.brahvim.nerd.openal.al_buffers.AlUnknownFormatBuffer;
 import com.brahvim.nerd.openal.al_buffers.AlOggBuffer;
 
-public class AlSource extends AlNativeResource {
+public class AlSource extends AlNativeResource<Integer> {
 
 	// region Fields.
 	protected static final Vector<AlSource>
 	/*	 */ ALL_INSTANCES = new Vector<>(),
 			INSTANCES_TO_REMOVE = new Vector<>(0);
 
-	private final int id;
-	private final NerdAl alMan;
-	private final AlContext context;
-
-	// State tracking!:
+	// Framely state tracking!:
 	private boolean ppaused, paused;
 	private boolean pstopped, stopped;
 	private boolean pplaying, playing;
 	private boolean plooping, looping;
 
+	// Actual stuff:
 	private AlBuffer<?> buffer;
 	private AlBufferStream stream;
 	private AlAuxiliaryEffectSlot effectSlot;
@@ -42,25 +38,22 @@ public class AlSource extends AlNativeResource {
 
 	// region Constructors.
 	public AlSource(final NerdAl p_alMan) {
-		this.alMan = p_alMan;
-		this.context = this.alMan.getContext();
-		ALC10.alcMakeContextCurrent(this.context.getId());
-		this.alMan.checkAlcError();
+		super(p_alMan);
+		super.MAN.makeContextCurrent();
+		super.MAN.checkAlcError();
 
-		this.id = AL10.alGenSources();
-		this.alMan.checkAlError();
+		super.id = AL10.alGenSources();
+		super.MAN.checkAlError();
 
 		AlSource.ALL_INSTANCES.add(this);
 	}
 
 	public AlSource(final AlSource p_source) {
-		this.alMan = p_source.alMan;
-		this.context = p_source.context;
-
-		ALC10.alcMakeContextCurrent(this.context.getId());
-		this.alMan.checkAlcError();
-		this.id = AL10.alGenSources();
-		this.alMan.checkAlError();
+		super(p_source.MAN);
+		super.MAN.makeContextCurrent();
+		super.MAN.checkAlcError();
+		super.id = AL10.alGenSources();
+		super.MAN.checkAlError();
 
 		// region Transfer properties over (hopefully, the JIT inlines!):
 		// this.setSourceType(p_source.getSourceType()); // Disallowed by OpenAL!
@@ -112,8 +105,8 @@ public class AlSource extends AlNativeResource {
 	// region ...literal "buffer distribution", :joy:
 	@SuppressWarnings({ "unchecked", "deprecation" })
 	public <T extends Buffer> AlBuffer<T> getBuffer() {
-		final int BUFFER_ID = this.getInt(AL10.AL_BUFFER);
-		if (BUFFER_ID == this.buffer.getId())
+		final int bufferId = this.getInt(AL10.AL_BUFFER);
+		if (bufferId == this.buffer.getId())
 			return (AlBuffer<T>) this.buffer;
 
 		if (this.buffer instanceof AlOggBuffer)
@@ -123,7 +116,7 @@ public class AlSource extends AlNativeResource {
 		else if (this.buffer instanceof com.brahvim.nerd.openal.al_buffers.AlMp3Buffer)
 			return (AlBuffer<T>) this.buffer;
 		else
-			return (AlBuffer<T>) new AlNoTypeBuffer(this.alMan, BUFFER_ID);
+			return (AlBuffer<T>) new AlUnknownFormatBuffer(super.MAN, bufferId);
 	}
 
 	public AlSource setBuffer(final AlBuffer<?> p_buffer) {
@@ -135,44 +128,44 @@ public class AlSource extends AlNativeResource {
 
 	// region C-style OpenAL getters.
 	public int getInt(final int p_alEnum) {
-		ALC10.alcMakeContextCurrent(this.context.getId());
-		this.alMan.checkAlcError();
+		super.MAN.makeContextCurrent();
+		super.MAN.checkAlcError();
 
 		if (super.hasDisposed)
 			return Integer.MIN_VALUE;
 
-		return AL10.alGetSourcei(this.id, p_alEnum);
+		return AL10.alGetSourcei(super.id, p_alEnum);
 	}
 
 	public float getFloat(final int p_alEnum) {
-		ALC10.alcMakeContextCurrent(this.context.getId());
-		this.alMan.checkAlcError();
+		super.MAN.makeContextCurrent();
+		super.MAN.checkAlcError();
 
 		if (super.hasDisposed)
 			return -Float.MAX_VALUE;
 
-		return AL10.alGetSourcef(this.id, p_alEnum);
+		return AL10.alGetSourcef(super.id, p_alEnum);
 	}
 
 	// Vectors in OpenAL are not large and can be allocated on the stack just fine.
 	public int[] getIntVector(final int p_alEnum, final int p_vecSize) {
-		ALC10.alcMakeContextCurrent(this.context.getId());
-		this.alMan.checkAlcError();
+		super.MAN.makeContextCurrent();
+		super.MAN.checkAlcError();
 		MemoryStack.stackPush();
 		final IntBuffer intBuffer = MemoryStack.stackMallocInt(p_vecSize);
 
 		if (super.hasDisposed)
 			return new int[0];
 
-		AL10.alGetSourceiv(this.id, p_alEnum, intBuffer);
+		AL10.alGetSourceiv(super.id, p_alEnum, intBuffer);
 		MemoryStack.stackPop();
 
 		return intBuffer.array();
 	}
 
 	public float[] getFloatTriplet(final int p_alEnum) {
-		ALC10.alcMakeContextCurrent(this.context.getId());
-		this.alMan.checkAlcError();
+		super.MAN.makeContextCurrent();
+		super.MAN.checkAlcError();
 		MemoryStack.stackPush();
 		final FloatBuffer f1 = MemoryStack.stackMallocFloat(1),
 				f2 = MemoryStack.stackMallocFloat(1),
@@ -181,37 +174,37 @@ public class AlSource extends AlNativeResource {
 		if (super.hasDisposed)
 			return new float[0];
 
-		AL10.alGetSource3f(this.id, p_alEnum, f1, f2, f3);
+		AL10.alGetSource3f(super.id, p_alEnum, f1, f2, f3);
 		MemoryStack.stackPop();
 
 		return new float[] { f1.get(), f2.get(), f3.get() };
 	}
 
 	public float[] getFloatVector(final int p_alEnum, final int p_vecSize) {
-		ALC10.alcMakeContextCurrent(this.context.getId());
-		this.alMan.checkAlcError();
+		super.MAN.makeContextCurrent();
+		super.MAN.checkAlcError();
 		MemoryStack.stackPush();
 		final FloatBuffer floatBuffer = MemoryStack.stackMallocFloat(p_vecSize);
 
 		if (super.hasDisposed)
 			return new float[0];
 
-		AL10.alGetSourcefv(this.id, p_alEnum, floatBuffer);
+		AL10.alGetSourcefv(super.id, p_alEnum, floatBuffer);
 		MemoryStack.stackPop();
 
 		return floatBuffer.array();
 	}
 
 	public int[] getIntTriplet(final int p_alEnum) {
-		ALC10.alcMakeContextCurrent(this.context.getId());
-		this.alMan.checkAlcError();
+		super.MAN.makeContextCurrent();
+		super.MAN.checkAlcError();
 		MemoryStack.stackPush();
 		final IntBuffer intBuffer = MemoryStack.stackMallocInt(3);
 
 		if (super.hasDisposed)
 			return new int[0];
 
-		AL10.alGetSourceiv(this.id, p_alEnum, intBuffer);
+		AL10.alGetSourceiv(super.id, p_alEnum, intBuffer);
 		MemoryStack.stackPop();
 
 		return intBuffer.array();
@@ -220,34 +213,34 @@ public class AlSource extends AlNativeResource {
 
 	// region C-style OpenAL setters.
 	public AlSource setInt(final int p_alEnum, final int p_value) {
-		ALC10.alcMakeContextCurrent(this.context.getId());
-		this.alMan.checkAlcError();
-		AL10.alSourcei(this.id, p_alEnum, p_value);
-		this.alMan.checkAlError();
+		super.MAN.makeContextCurrent();
+		super.MAN.checkAlcError();
+		AL10.alSourcei(super.id, p_alEnum, p_value);
+		super.MAN.checkAlError();
 		return this;
 	}
 
 	public AlSource setFloat(final int p_alEnum, final float p_value) {
-		ALC10.alcMakeContextCurrent(this.context.getId());
-		this.alMan.checkAlcError();
-		AL10.alSourcef(this.id, p_alEnum, p_value);
-		this.alMan.checkAlError();
+		super.MAN.makeContextCurrent();
+		super.MAN.checkAlcError();
+		AL10.alSourcef(super.id, p_alEnum, p_value);
+		super.MAN.checkAlError();
 		return this;
 	}
 
 	public AlSource setIntVector(final int p_alEnum, final int... p_values) {
-		ALC10.alcMakeContextCurrent(this.context.getId());
-		this.alMan.checkAlcError();
-		AL11.alSourceiv(this.id, p_alEnum, p_values);
-		this.alMan.checkAlError();
+		super.MAN.makeContextCurrent();
+		super.MAN.checkAlcError();
+		AL11.alSourceiv(super.id, p_alEnum, p_values);
+		super.MAN.checkAlError();
 		return this;
 	}
 
 	public AlSource setFloatVector(final int p_alEnum, final float... p_values) {
-		ALC10.alcMakeContextCurrent(this.context.getId());
-		this.alMan.checkAlcError();
-		AL10.alSourcefv(this.id, p_alEnum, p_values);
-		this.alMan.checkAlError();
+		super.MAN.makeContextCurrent();
+		super.MAN.checkAlcError();
+		AL10.alSourcefv(super.id, p_alEnum, p_values);
+		super.MAN.checkAlError();
 		return this;
 	}
 
@@ -256,18 +249,18 @@ public class AlSource extends AlNativeResource {
 			throw new IllegalArgumentException(
 					"`AlSource::setIntTriplet()` cannot take an array of size other than `3`!");
 
-		ALC10.alcMakeContextCurrent(this.context.getId());
-		this.alMan.checkAlcError();
-		AL11.alSource3i(this.id, p_alEnum, p_value[0], p_value[1], p_value[2]);
-		this.alMan.checkAlError();
+		super.MAN.makeContextCurrent();
+		super.MAN.checkAlcError();
+		AL11.alSource3i(super.id, p_alEnum, p_value[0], p_value[1], p_value[2]);
+		super.MAN.checkAlError();
 		return this;
 	}
 
 	public AlSource setIntTriplet(final int p_alEnum, final int p_i1, final int p_i2, final int p_i3) {
-		ALC10.alcMakeContextCurrent(this.context.getId());
-		this.alMan.checkAlcError();
-		AL11.alSource3i(this.id, p_alEnum, p_i1, p_i2, p_i3);
-		this.alMan.checkAlError();
+		super.MAN.makeContextCurrent();
+		super.MAN.checkAlcError();
+		AL11.alSource3i(super.id, p_alEnum, p_i1, p_i2, p_i3);
+		super.MAN.checkAlError();
 		return this;
 	}
 
@@ -276,27 +269,23 @@ public class AlSource extends AlNativeResource {
 			throw new IllegalArgumentException(
 					"`AlSource::setFloatTriplet()` cannot take an array of size other than `3`!");
 
-		ALC10.alcMakeContextCurrent(this.context.getId());
-		this.alMan.checkAlcError();
-		AL10.alSource3f(this.id, p_alEnum, p_value[0], p_value[1], p_value[2]);
-		this.alMan.checkAlError();
+		super.MAN.makeContextCurrent();
+		super.MAN.checkAlcError();
+		AL10.alSource3f(super.id, p_alEnum, p_value[0], p_value[1], p_value[2]);
+		super.MAN.checkAlError();
 		return this;
 	}
 
 	public AlSource setFloatTriplet(final int p_alEnum, final float p_f1, final float p_f2, final float p_f3) {
-		ALC10.alcMakeContextCurrent(this.context.getId());
-		this.alMan.checkAlcError();
-		AL10.alSource3f(this.id, p_alEnum, p_f1, p_f2, p_f3);
-		this.alMan.checkAlError();
+		super.MAN.makeContextCurrent();
+		super.MAN.checkAlcError();
+		AL10.alSource3f(super.id, p_alEnum, p_f1, p_f2, p_f3);
+		super.MAN.checkAlError();
 		return this;
 	}
 	// endregion
 
 	// region Source getters.
-	public int getId() {
-		return this.id;
-	}
-
 	// region `int` getters.
 	public int getSourceType() {
 		return this.getInt(AL10.AL_SOURCE_TYPE);
@@ -452,7 +441,7 @@ public class AlSource extends AlNativeResource {
 	}
 
 	public AlSource setPitchMultiplier(final float value) {
-		AL10.alSourcef(this.id, AL10.AL_PITCH, value);
+		AL10.alSourcef(super.id, AL10.AL_PITCH, value);
 		return this;
 	}
 
@@ -530,7 +519,7 @@ public class AlSource extends AlNativeResource {
 	// endregion
 	// endregion
 
-	// region Anything `EXTEfx`.
+	// region Anything `ALC_EXT_Efx`.
 	public AlAuxiliaryEffectSlot getEffectSlot() {
 		return this.effectSlot;
 	}
@@ -541,19 +530,19 @@ public class AlSource extends AlNativeResource {
 	public AlAuxiliaryEffectSlot setEffectSlot(final AlAuxiliaryEffectSlot p_effectSlot) {
 		final AlAuxiliaryEffectSlot toRet = this.effectSlot;
 		this.effectSlot = p_effectSlot;
-		final int EFFECT_SLOT_ID;
+		final int effectSlotId;
 
 		if (this.effectSlot == null) {
-			EFFECT_SLOT_ID = EXTEfx.AL_EFFECTSLOT_NULL;
+			effectSlotId = EXTEfx.AL_EFFECTSLOT_NULL;
 			return toRet;
 		} else {
 			this.effectSlot.setSource(this);
-			EFFECT_SLOT_ID = this.effectSlot.getId();
+			effectSlotId = this.effectSlot.getId();
 		}
 
 		this.setIntTriplet(
 				EXTEfx.AL_AUXILIARY_SEND_FILTER,
-				EFFECT_SLOT_ID, 0,
+				effectSlotId, 0,
 				this.auxiliarySendFilter == null
 						? EXTEfx.AL_FILTER_NULL
 						: this.auxiliarySendFilter.getId());
@@ -574,14 +563,15 @@ public class AlSource extends AlNativeResource {
 	}
 
 	/**
-	 * @return The older filter object attached.
+	 * @return The filter object already attached. {@code null} if there is none.
 	 */
 	public AlFilter attachDirectFilter(final AlFilter p_filter) {
 		final AlFilter toRet = this.directFilter;
 		this.directFilter = p_filter;
-		this.setInt(EXTEfx.AL_DIRECT_FILTER, this.directFilter == null
-				? EXTEfx.AL_FILTER_NULL
-				: this.directFilter.getId());
+		this.setInt(EXTEfx.AL_DIRECT_FILTER,
+				this.directFilter == null
+						? EXTEfx.AL_FILTER_NULL
+						: this.directFilter.getId());
 
 		return toRet;
 	}
@@ -673,9 +663,9 @@ public class AlSource extends AlNativeResource {
 
 	// region Actual state management!
 	public void play() {
-		ALC10.alcMakeContextCurrent(this.context.getId());
-		this.alMan.checkAlcError();
-		AL10.alSourcePlay(this.id);
+		super.MAN.makeContextCurrent();
+		super.MAN.checkAlcError();
+		AL10.alSourcePlay(super.id);
 	}
 
 	public void playThenDispose() {
@@ -693,21 +683,21 @@ public class AlSource extends AlNativeResource {
 	}
 
 	public void stop() {
-		ALC10.alcMakeContextCurrent(this.context.getId());
-		this.alMan.checkAlcError();
-		AL10.alSourceStop(this.id);
+		super.MAN.makeContextCurrent();
+		super.MAN.checkAlcError();
+		AL10.alSourceStop(super.id);
 	}
 
 	public void pause() {
-		ALC10.alcMakeContextCurrent(this.context.getId());
-		this.alMan.checkAlcError();
-		AL10.alSourcePause(this.id);
+		super.MAN.makeContextCurrent();
+		super.MAN.checkAlcError();
+		AL10.alSourcePause(super.id);
 	}
 
 	public void rewind() {
-		ALC10.alcMakeContextCurrent(this.context.getId());
-		this.alMan.checkAlcError();
-		AL10.alSourceRewind(this.id);
+		super.MAN.makeContextCurrent();
+		super.MAN.checkAlcError();
+		AL10.alSourceRewind(super.id);
 	}
 
 	public AlBufferStream getStream() {
@@ -719,7 +709,8 @@ public class AlSource extends AlNativeResource {
 		return this;
 	}
 
-	/* `package` */ void framelyCallback() {
+	@Override
+	protected void framelyCallback() {
 		if (this.stream != null)
 			this.stream.framelyCallback();
 
@@ -743,22 +734,22 @@ public class AlSource extends AlNativeResource {
 	}
 
 	public void queueBuffers(final AlBuffer<?> p_buffer) {
-		ALC10.alcMakeContextCurrent(this.context.getId());
-		this.alMan.checkAlcError();
-		AL10.alSourceQueueBuffers(this.id, p_buffer.getId());
+		super.MAN.makeContextCurrent();
+		super.MAN.checkAlcError();
+		AL10.alSourceQueueBuffers(super.id, p_buffer.getId());
 	}
 
 	public void queueBuffers(final AlBuffer<?>... p_buffers) {
 		final int[] buffers = new int[p_buffers.length];
-		ALC10.alcMakeContextCurrent(this.context.getId());
-		this.alMan.checkAlcError();
-		AL10.alSourceQueueBuffers(this.id, buffers);
+		super.MAN.makeContextCurrent();
+		super.MAN.checkAlcError();
+		AL10.alSourceQueueBuffers(super.id, buffers);
 	}
 
 	public void unqueueBuffers(final AlBuffer<?> p_buffer) {
-		ALC10.alcMakeContextCurrent(this.context.getId());
-		this.alMan.checkAlcError();
-		AL10.alSourceUnqueueBuffers(this.id, new int[] { p_buffer.getId() });
+		super.MAN.makeContextCurrent();
+		super.MAN.checkAlcError();
+		AL10.alSourceUnqueueBuffers(super.id, new int[] { p_buffer.getId() });
 	}
 
 	public void unqueueBuffers(final AlBuffer<?>... p_buffers) {
@@ -767,9 +758,9 @@ public class AlSource extends AlNativeResource {
 		for (int i = 0; i < buffers.length; i++)
 			buffers[i] = p_buffers[i].getId();
 
-		ALC10.alcMakeContextCurrent(this.context.getId());
-		this.alMan.checkAlcError();
-		AL10.alSourceUnqueueBuffers(this.id, buffers);
+		super.MAN.makeContextCurrent();
+		super.MAN.checkAlcError();
+		AL10.alSourceUnqueueBuffers(super.id, buffers);
 	}
 
 	public void disposeWithBuffer() {
@@ -779,10 +770,10 @@ public class AlSource extends AlNativeResource {
 
 	@Override
 	protected void disposeImpl() {
-		ALC10.alcMakeContextCurrent(this.context.getId());
-		this.alMan.checkAlcError();
-		AL10.alDeleteSources(this.id);
-		this.alMan.checkAlError();
+		super.MAN.makeContextCurrent();
+		super.MAN.checkAlcError();
+		AL10.alDeleteSources(super.id);
+		super.MAN.checkAlError();
 		AlSource.INSTANCES_TO_REMOVE.add(this);
 	}
 	// endregion
