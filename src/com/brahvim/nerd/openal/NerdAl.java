@@ -90,16 +90,42 @@ public class NerdAl {
 		this.createAl(p_context);
 	}
 
+	/**
+	 * Lets this {@link NerdAl} instance construct, then wrap an {@link AlContext}
+	 * wrapper object given settings to initialize it.
+	 *
+	 * @param p_settings specifies initialization settings.
+	 */
 	public NerdAl(final AlContext.AlContextSettings p_settings) {
 		this.context = this.createAl(AlDevice.getDefaultPhysicalDeviceName(), p_settings);
 		this.contextId = this.context.getId();
 	}
 
+	/**
+	 * Lets this {@link NerdAl} instance construct, then wrap an {@link AlContext}
+	 * wrapper object constructed on the given {@link AlDevice}, given settings to
+	 * initialize said {@link AlContext}.
+	 *
+	 * @param p_device   is the {@link AlDevice} to create a context in.
+	 * @param p_settings specifies initialization settings for the
+	 *                   {@link AlContext} to create.
+	 */
 	public NerdAl(final AlDevice p_device, final AlContext.AlContextSettings p_settings) {
 		this.context = this.createAl(p_device, p_settings);
 		this.contextId = this.context.getId();
 	}
 
+	/**
+	 * Lets this {@link NerdAl} instance construct, then wrap an {@link AlContext}
+	 * (given settings to initialize it) constructed on an
+	 * {@link AlDevice}, which outputs to the physical device whose name is
+	 * provided.
+	 *
+	 * @param p_deviceName is the name of the physical device the automatically
+	 *                     created {@link AlDevice} will output to.
+	 * @param p_settings   specifies initialization settings for the
+	 *                     {@link AlContext} to create.
+	 */
 	public NerdAl(final String p_deviceName, final AlContext.AlContextSettings p_settings) {
 		this.context = this.createAl(p_deviceName, p_settings);
 		this.contextId = this.context.getId();
