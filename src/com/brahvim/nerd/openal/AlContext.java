@@ -30,7 +30,7 @@ public class AlContext extends AlNativeResource<Long> {
 					ALC11.ALC_MONO_SOURCES, this.monoSources,
 					ALC11.ALC_STEREO_SOURCES, this.stereoSources,
 					ALC10.ALC_REFRESH, this.refresh,
-					ALC10.ALC_SYNC, this.sync ? ALC10.ALC_TRUE : ALC10.ALC_FALSE
+					ALC10.ALC_SYNC, this.sync ? ALC10.ALC_TRUE : ALC10.ALC_FALSE,
 			};
 		}
 
@@ -39,9 +39,7 @@ public class AlContext extends AlNativeResource<Long> {
 	// region Fields.
 	protected static final Vector<AlContext> ALL_INSTANCES = new Vector<>();
 
-	private final long deviceId;
-	private final AlDevice device;
-	private final ArrayList<AlBuffer<?>> buffers;
+	protected final AlDevice DEVICE;
 	// endregion
 
 	// region Constructors.
@@ -52,9 +50,7 @@ public class AlContext extends AlNativeResource<Long> {
 	public AlContext(final NerdAl p_alMan, final AlContext.AlContextSettings p_settings) {
 		super(p_alMan);
 
-		this.buffers = new ArrayList<>();
-		this.device = p_alMan.getDevice();
-		this.deviceId = this.device.getId();
+		this.DEVICE = p_alMan.getDevice();
 		super.id = this.createCtx(p_settings);
 
 		AlContext.ALL_INSTANCES.add(this);
@@ -73,19 +69,14 @@ public class AlContext extends AlNativeResource<Long> {
 
 	// region Getters.
 	public AlDevice getDevice() {
-		return this.device;
-	}
-
-	@SuppressWarnings("unchecked")
-	public ArrayList<AlBuffer<?>> getBuffers() {
-		return (ArrayList<AlBuffer<?>>) this.buffers.clone();
+		return this.DEVICE;
 	}
 	// endregion
 
 	// region OpenAL listener manipulation.
 	// region C-style OpenAL listener getters.
-	public int getListenerInt(final long p_ctxId, final int p_alEnum) {
-		ALC10.alcMakeContextCurrent(p_ctxId);
+	public int getListenerInt(final int p_alEnum) {
+		super.MAN.makeContextCurrent();
 		this.checkAlcError();
 
 		if (this.hasDisposed)
@@ -93,8 +84,8 @@ public class AlContext extends AlNativeResource<Long> {
 		return AL10.alGetListeneri(p_alEnum);
 	}
 
-	public float getListenerFloat(final long p_ctxId, final int p_alEnum) {
-		ALC10.alcMakeContextCurrent(p_ctxId);
+	public float getListenerFloat(final int p_alEnum) {
+		super.MAN.makeContextCurrent();
 		this.checkAlcError();
 
 		if (this.hasDisposed)
@@ -103,10 +94,10 @@ public class AlContext extends AlNativeResource<Long> {
 	}
 
 	// Vectors in OpenAL are not large and can be allocated on the stack just fine.
-	public int[] getListenerIntVector(final long p_ctxId, final int p_alEnum, final int p_vecSize) {
+	public int[] getListenerIntVector(final int p_alEnum, final int p_vecSize) {
 		MemoryStack.stackPush();
 		final IntBuffer intBuffer = MemoryStack.stackMallocInt(p_vecSize);
-		ALC10.alcMakeContextCurrent(p_ctxId);
+		super.MAN.makeContextCurrent();
 		this.checkAlcError();
 
 		if (this.hasDisposed)
@@ -117,10 +108,10 @@ public class AlContext extends AlNativeResource<Long> {
 		return intBuffer.array();
 	}
 
-	public float[] getListenerFloatVector(final long p_ctxId, final int p_alEnum, final int p_vecSize) {
+	public float[] getListenerFloatVector(final int p_alEnum, final int p_vecSize) {
 		MemoryStack.stackPush();
 		final FloatBuffer floatBuffer = MemoryStack.stackMallocFloat(p_vecSize);
-		ALC10.alcMakeContextCurrent(p_ctxId);
+		super.MAN.makeContextCurrent();
 		this.checkAlcError();
 
 		if (this.hasDisposed)
@@ -131,10 +122,10 @@ public class AlContext extends AlNativeResource<Long> {
 		return floatBuffer.array();
 	}
 
-	public int[] getListenerIntTriplet(final long p_ctxId, final int p_alEnum) {
+	public int[] getListenerIntTriplet(final int p_alEnum) {
 		MemoryStack.stackPush();
 		final IntBuffer intBuffer = MemoryStack.stackMallocInt(3);
-		ALC10.alcMakeContextCurrent(p_ctxId);
+		super.MAN.makeContextCurrent();
 		this.checkAlcError();
 
 		if (this.hasDisposed)
@@ -145,10 +136,10 @@ public class AlContext extends AlNativeResource<Long> {
 		return intBuffer.array();
 	}
 
-	public float[] getListenerFloatTriplet(final long p_ctxId, final int p_alEnum) {
+	public float[] getListenerFloatTriplet(final int p_alEnum) {
 		MemoryStack.stackPush();
 		final FloatBuffer floatBuffer = MemoryStack.stackMallocFloat(3);
-		ALC10.alcMakeContextCurrent(p_ctxId);
+		super.MAN.makeContextCurrent();
 		this.checkAlcError();
 
 		if (this.hasDisposed)
@@ -157,81 +148,79 @@ public class AlContext extends AlNativeResource<Long> {
 		MemoryStack.stackPop();
 
 		return floatBuffer.array();
-		// return new PVector(floatBuffer.get(), floatBuffer.get(), floatBuffer.get());
 	}
 	// endregion
 
 	// region C-style OpenAL listener setters.
-	public void setListenerInt(final long p_ctxId, final int p_alEnum, final int p_value) {
-		ALC10.alcMakeContextCurrent(p_ctxId);
+	public void setListenerInt(final int p_alEnum, final int p_value) {
+		super.MAN.makeContextCurrent();
 		this.checkAlcError();
 		AL10.alListeneri(p_alEnum, p_value);
 		super.MAN.checkAlError();
 	}
 
-	public void setListenerFloat(final long p_ctxId, final int p_alEnum, final float p_value) {
-		ALC10.alcMakeContextCurrent(p_ctxId);
+	public void setListenerFloat(final int p_alEnum, final float p_value) {
+		super.MAN.makeContextCurrent();
 		this.checkAlcError();
 		AL10.alListenerf(p_alEnum, p_value);
 		super.MAN.checkAlError();
 	}
 
-	public void setListenerIntVector(final long p_ctxId, final int p_alEnum, final int... p_value) {
-		ALC10.alcMakeContextCurrent(p_ctxId);
+	public void setListenerIntVector(final int p_alEnum, final int... p_values) {
+		super.MAN.makeContextCurrent();
 		this.checkAlcError();
-		AL11.alListeneriv(p_alEnum, p_value);
+		AL11.alListeneriv(p_alEnum, p_values);
 		super.MAN.checkAlError();
 	}
 
-	public void setListenerFloatVector(final long p_ctxId, final int p_alEnum, final float... p_values) {
-		ALC10.alcMakeContextCurrent(p_ctxId);
+	public void setListenerFloatVector(final int p_alEnum, final float... p_values) {
+		super.MAN.makeContextCurrent();
 		this.checkAlcError();
 		AL10.alListenerfv(p_alEnum, p_values);
 		super.MAN.checkAlError();
 	}
 
-	public void setListenerIntTriplet(final long p_ctxId, final int p_alEnum, final int... p_value) {
-		if (p_value.length != 3)
+	public void setListenerIntTriplet(final int p_alEnum, final int... p_values) {
+		if (p_values.length != 3)
 			throw new IllegalArgumentException(
 					"`AlSource::setIntTriplet(AlContext p_ctx, )` cannot take an array of size other than `3`!");
 
-		ALC10.alcMakeContextCurrent(p_ctxId);
+		super.MAN.makeContextCurrent();
 		this.checkAlcError();
-		AL11.alListener3i(p_alEnum, p_value[0], p_value[1], p_value[2]);
+		AL11.alListener3i(p_alEnum, p_values[0], p_values[1], p_values[2]);
 		super.MAN.checkAlError();
 	}
 
-	public void setListenerIntTriplet(final long p_ctxId, final int p_alEnum, final int p_i1, final int p_i2,
+	public void setListenerIntTriplet(final int p_alEnum, final int p_i1, final int p_i2,
 			final int p_i3) {
-		ALC10.alcMakeContextCurrent(p_ctxId);
+		super.MAN.makeContextCurrent();
 		this.checkAlcError();
 		AL11.alListener3i(p_alEnum, p_i1, p_i2, p_i3);
 		super.MAN.checkAlError();
 	}
 
-	public void setListenerFloatTriplet(final long p_ctxId, final int p_alEnum, final float... p_value) {
-		if (p_value.length != 3)
+	public void setListenerFloatTriplet(final int p_alEnum, final float... p_values) {
+		if (p_values.length != 3)
 			throw new IllegalArgumentException(
 					"`AlSource::setFloatTriplet()` cannot take an array of a size other than `3`!");
 
-		ALC10.alcMakeContextCurrent(p_ctxId);
+		super.MAN.makeContextCurrent();
 		this.checkAlcError();
-		AL10.alListener3f(p_alEnum, p_value[0], p_value[1], p_value[2]);
+		AL10.alListener3f(p_alEnum, p_values[0], p_values[1], p_values[2]);
 		super.MAN.checkAlError();
 	}
 
-	public void setListenerFloatTriplet(final long p_ctxId, final int p_alEnum, final float p_f1, final float p_f2,
-			final float p_f3) {
-		ALC10.alcMakeContextCurrent(p_ctxId);
+	public void setListenerFloatTriplet(final int p_alEnum, final float p_f1, final float p_f2, final float p_f3) {
+		super.MAN.makeContextCurrent();
 		this.checkAlcError();
 		AL10.alListener3f(p_alEnum, p_f1, p_f2, p_f3);
 		super.MAN.checkAlError();
 	}
 	// endregion
 
-	// region Default listener getters.
+	// region Listener getters.
 	public float getListenerMetersPerUnit() {
-		ALC10.alcMakeContextCurrent(super.id);
+		super.MAN.makeContextCurrent();
 		this.checkAlcError();
 
 		if (this.hasDisposed)
@@ -240,7 +229,7 @@ public class AlContext extends AlNativeResource<Long> {
 	}
 
 	public float getListenerGain() {
-		ALC10.alcMakeContextCurrent(super.id);
+		super.MAN.makeContextCurrent();
 		this.checkAlcError();
 
 		if (this.hasDisposed)
@@ -251,7 +240,7 @@ public class AlContext extends AlNativeResource<Long> {
 	public float[] getListenerPosition() {
 		// MemoryStack.stackPush();
 		final float[] floatArray = new float[3];
-		ALC10.alcMakeContextCurrent(super.id);
+		super.MAN.makeContextCurrent();
 		this.checkAlcError();
 
 		if (this.hasDisposed)
@@ -266,7 +255,7 @@ public class AlContext extends AlNativeResource<Long> {
 	public float[] getListenerVelocity() {
 		// MemoryStack.stackPush();
 		final float[] floatArray = new float[3];
-		ALC10.alcMakeContextCurrent(super.id);
+		super.MAN.makeContextCurrent();
 		this.checkAlcError();
 
 		if (this.hasDisposed)
@@ -281,7 +270,7 @@ public class AlContext extends AlNativeResource<Long> {
 	public float[] getListenerOrientation() {
 		// MemoryStack.stackPush();
 		final float[] floatArray = new float[3];
-		ALC10.alcMakeContextCurrent(super.id);
+		super.MAN.makeContextCurrent();
 		this.checkAlcError();
 
 		if (this.hasDisposed)
@@ -294,16 +283,16 @@ public class AlContext extends AlNativeResource<Long> {
 	}
 	// endregion
 
-	// region Default listener setters.
+	// region Listener setters.
 	public void setListenerGain(final float p_value) {
-		ALC10.alcMakeContextCurrent(super.id);
+		super.MAN.makeContextCurrent();
 		this.checkAlcError();
 		AL10.alListenerf(AL10.AL_GAIN, p_value);
 		super.MAN.checkAlError();
 	}
 
 	public void setMetersPerUnit(final float p_value) {
-		ALC10.alcMakeContextCurrent(super.id);
+		super.MAN.makeContextCurrent();
 		this.checkAlcError();
 		AL10.alListenerf(EXTEfx.AL_METERS_PER_UNIT, p_value);
 		super.MAN.checkAlError();
@@ -315,7 +304,7 @@ public class AlContext extends AlNativeResource<Long> {
 			throw new IllegalArgumentException(
 					"`AlSource::setListenerPosition()` cannot take an array of a size other than `3`!");
 
-		ALC10.alcMakeContextCurrent(super.id);
+		super.MAN.makeContextCurrent();
 		this.checkAlcError();
 		AL10.alListener3f(AL10.AL_POSITION, p_values[0], p_values[1], p_values[2]);
 		super.MAN.checkAlError();
@@ -326,7 +315,7 @@ public class AlContext extends AlNativeResource<Long> {
 			throw new IllegalArgumentException(
 					"`AlSource::setListenerVelocity()` cannot take an array of a size other than `3`!");
 
-		ALC10.alcMakeContextCurrent(super.id);
+		super.MAN.makeContextCurrent();
 		this.checkAlcError();
 		AL10.alListener3f(AL10.AL_VELOCITY, p_values[0], p_values[1], p_values[2]);
 		super.MAN.checkAlError();
@@ -346,7 +335,7 @@ public class AlContext extends AlNativeResource<Long> {
 		values[2] = p_values[2] == 0.0f ? 0.0f : p_values[2] > 0.0f ? 1.0f : -1.0f;
 
 		try { // Need to put this in a try-catch block...
-			this.setListenerFloatVector(super.id, AL10.AL_ORIENTATION, values);
+			this.setListenerFloatVector(AL10.AL_ORIENTATION, values);
 		} catch (final AlException e) { // TOO MANY FALSE POSITIVES!
 			// System.out.printf("""
 			// Setting the listener's orientation to `%s` failed!
@@ -358,31 +347,32 @@ public class AlContext extends AlNativeResource<Long> {
 	// endregion
 
 	public int checkAlcError() {
-		final int errorCode = ALC10.alcGetError(this.device.getId());
+		final int errorCode = ALC10.alcGetError(this.DEVICE.getId());
 
 		if (errorCode != 0)
-			throw new AlcException(this.deviceId, errorCode);
+			throw new AlcException(this.DEVICE.getId(), errorCode);
 
 		return errorCode;
 	}
 
-	private long createCtx(AlContext.AlContextSettings p_settings) {
+	protected long createCtx(AlContext.AlContextSettings p_settings) {
 		// Finally, a `null` check!:
 
 		if (p_settings == null) {
 			// System.err.println(
-			// "`AlContext(NerdAl, AlContextSettings)` received a `null` settings object.");
+			// "`AlContext::AlContext(NerdAl, AlContext.AlContextSettings)` received a
+			// `null` settings object.");
 			p_settings = new AlContextSettings();
 		}
 
-		final long toRet = ALC10.alcCreateContext(this.deviceId, p_settings.asAttribArray());
-		super.MAN.checkAlcError();
+		final long toRet = ALC10.alcCreateContext(this.DEVICE.getId(), p_settings.asAttribArray());
+		this.checkAlcError();
 
 		// Placing the check into a boolean to check for errors right away!
-		final boolean ctxVerifStatus = ALC10.alcMakeContextCurrent(toRet);
-		super.MAN.checkAlcError();
+		final boolean ctxVerifiedStatus = ALC10.alcMakeContextCurrent(toRet);
+		this.checkAlcError();
 
-		if (toRet == 0 || !ctxVerifStatus)
+		if (toRet == 0 || !ctxVerifiedStatus)
 			super.dispose();
 
 		return toRet;
@@ -392,15 +382,14 @@ public class AlContext extends AlNativeResource<Long> {
 	protected void disposeImpl() {
 		// Unlink the current context object:
 		if (!ALC10.alcMakeContextCurrent(0))
-			throw new NerdAlException(
-					"Could not change the OpenAL context (whilst disposing one)!");
+			throw new NerdAlException("Could not change the OpenAL context (whilst disposing one)!");
 
-		super.MAN.checkAlcError();
+		this.checkAlcError();
 
 		// *Actually* destroy the context object:
 		ALC10.alcDestroyContext(super.id);
 
-		super.MAN.checkAlcError();
+		this.checkAlcError();
 		AlContext.ALL_INSTANCES.remove(this);
 	}
 

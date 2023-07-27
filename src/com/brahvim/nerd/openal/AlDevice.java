@@ -21,21 +21,21 @@ public class AlDevice extends AlNativeResource<Long> {
 	// region Fields.
 	protected static final Vector<AlDevice> ALL_INSTANCES = new Vector<>();
 
-	private String name;
-	private Supplier<String> disconnectionCallback = AlDevice::getDefaultDeviceName;
+	protected String physicalDeviceName = "";
+	protected Supplier<String> disconnectionCallback = AlDevice::getDefaultPhysicalDeviceName;
 	// endregion
 
 	// region Constructors.
 	public AlDevice(final NerdAl p_alMan) {
-		this(p_alMan, AlDevice.getDefaultDeviceName());
+		this(p_alMan, AlDevice.getDefaultPhysicalDeviceName());
 	}
 
 	public AlDevice(final NerdAl p_alMan, final String p_deviceName) {
 		super(p_alMan);
 		AlDevice.ALL_INSTANCES.add(this);
 
-		this.name = p_deviceName;
-		super.id = ALC10.alcOpenDevice(this.name);
+		this.physicalDeviceName = p_deviceName;
+		super.id = ALC10.alcOpenDevice(this.physicalDeviceName);
 
 		// Check for errors here because we can't call `NerdAl::checkAlcError()` yet:
 		final int alcError = ALC10.alcGetError(super.id);
@@ -55,11 +55,11 @@ public class AlDevice extends AlNativeResource<Long> {
 	}
 	// endregion
 
-	public static String getDefaultDeviceName() {
+	public static String getDefaultPhysicalDeviceName() {
 		return ALC10.alcGetString(0, ALC10.ALC_DEFAULT_DEVICE_SPECIFIER);
 	}
 
-	public static List<String> getDevices() {
+	public static List<String> getPhysicalDevicesNames() {
 		return ALUtil.getStringList(0, ALC11.ALC_ALL_DEVICES_SPECIFIER);
 	}
 	// endregion
@@ -74,7 +74,7 @@ public class AlDevice extends AlNativeResource<Long> {
 		this.resolveDisconnection();
 	}
 
-	private void resolveDisconnection() {
+	protected void resolveDisconnection() {
 		if (!this.isConnected())
 			this.changeEndpoint(this.disconnectionCallback.get());
 	}
@@ -82,7 +82,7 @@ public class AlDevice extends AlNativeResource<Long> {
 	public void changeEndpoint(final String p_dvName) {
 		if (!SOFTReopenDevice.alcReopenDeviceSOFT(super.id, p_dvName, new int[] { 0 }))
 			throw new NerdAlException("`SOFTReopenDevice` failed...");
-		this.name = p_dvName;
+		this.physicalDeviceName = p_dvName;
 	}
 
 	// This uses device handles and not device names. Thus, no `static` version.
@@ -98,8 +98,8 @@ public class AlDevice extends AlNativeResource<Long> {
 	// endregion
 
 	// region Getters (and the `isDefault()` query).
-	public String getName() {
-		return this.name;
+	public String getPhysicalDeviceName() {
+		return this.physicalDeviceName;
 	}
 
 	@Override
@@ -108,8 +108,8 @@ public class AlDevice extends AlNativeResource<Long> {
 	}
 
 	// I don't want to hold a `boolean` for this...
-	public boolean isDefault() {
-		return this.name.equals(AlDevice.getDefaultDeviceName());
+	public boolean usesDefaultPhysicalDevice() {
+		return this.physicalDeviceName.equals(AlDevice.getDefaultPhysicalDeviceName());
 	}
 	// endregion
 

@@ -23,17 +23,17 @@ public class AlSource extends AlNativeResource<Integer> {
 			INSTANCES_TO_REMOVE = new Vector<>(0);
 
 	// Framely state tracking!:
-	private boolean ppaused, paused;
-	private boolean pstopped, stopped;
-	private boolean pplaying, playing;
-	private boolean plooping, looping;
+	protected boolean ppaused, paused;
+	protected boolean pstopped, stopped;
+	protected boolean pplaying, playing;
+	protected boolean plooping, looping;
 
 	// Actual stuff:
-	private AlBuffer<?> buffer;
-	private AlBufferStream stream;
-	private AlAuxiliaryEffectSlot effectSlot;
-	private boolean disposeOnPlay, disposeBufferOnPlay;
-	private AlFilter directFilter, auxiliarySendFilter;
+	protected AlBuffer<?> buffer;
+	protected AlBufferStream stream;
+	protected AlAuxiliaryEffectSlot effectSlot;
+	protected boolean disposeOnPlay, disposeBufferOnPlay;
+	protected AlFilter directFilter, auxiliarySendFilter;
 	// endregion
 
 	// region Constructors.
@@ -520,6 +520,10 @@ public class AlSource extends AlNativeResource<Integer> {
 	// endregion
 
 	// region Anything `ALC_EXT_Efx`.
+	public int getEffectSlotId() {
+		return this.effectSlot == null ? EXTEfx.AL_EFFECTSLOT_NULL : this.effectSlot.getId();
+	}
+
 	public AlAuxiliaryEffectSlot getEffectSlot() {
 		return this.effectSlot;
 	}
@@ -530,10 +534,10 @@ public class AlSource extends AlNativeResource<Integer> {
 	public AlAuxiliaryEffectSlot setEffectSlot(final AlAuxiliaryEffectSlot p_effectSlot) {
 		final AlAuxiliaryEffectSlot toRet = this.effectSlot;
 		this.effectSlot = p_effectSlot;
-		final int effectSlotId;
+		int effectSlotId;
 
 		if (this.effectSlot == null) {
-			effectSlotId = EXTEfx.AL_EFFECTSLOT_NULL;
+			// effectSlotId = EXTEfx.AL_EFFECTSLOT_NULL;
 			return toRet;
 		} else {
 			this.effectSlot.setSource(this);

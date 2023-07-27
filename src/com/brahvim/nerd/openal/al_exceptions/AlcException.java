@@ -3,7 +3,7 @@ package com.brahvim.nerd.openal.al_exceptions;
 import org.lwjgl.openal.ALC10;
 
 /**
- * Thrown when `alcGetError()` checks report an error.
+ * Thrown when {@code alcGetError()} checks report an error.
  */
 public class AlcException extends NerdAbstractOpenAlException {
 

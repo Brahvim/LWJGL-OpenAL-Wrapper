@@ -19,12 +19,23 @@ import com.brahvim.nerd.openal.al_buffers.AlOggBuffer;
 import com.brahvim.nerd.openal.al_exceptions.AlException;
 import com.brahvim.nerd.openal.al_exceptions.AlcException;
 import com.brahvim.nerd.openal.al_exceptions.NerdAbstractOpenAlException;
+import com.brahvim.nerd.openal.al_exceptions.NerdAlException;
 
 /**
  * Wrapper to sit on top of an {@link AlContext} to allow access to
  * {@code al*()} functions.
  */
 public class NerdAl {
+
+	// Test using `main()`:
+	/*
+	 * public static void main(final String[] p_args) {
+	 * final NerdAl al = new NerdAl();
+	 * System.out.println("Created a `NerdAl` instance!");
+	 * al.makeContextCurrent();
+	 * System.out.println("Exiting, ba-bye!");
+	 * }
+	 */
 
 	// region Fields.
 	protected final Vector<AlNativeResource<?>> RESOURCES = new Vector<>(2), RESOURCES_TO_REMOVE = new Vector<>(2);
@@ -37,26 +48,50 @@ public class NerdAl {
 	// endregion
 
 	// region Construction.
+	/**
+	 * Creates OpenAL objects (an {@link AlDevice} and an {@link AlContext} on it)
+	 * for the "default" physical device connected.
+	 *
+	 * @see AlDevice#changeEndpoint(String) Use this method to change the physical
+	 *      device later without losing any objects already created.
+	 */
 	public NerdAl() {
-		this(AlDevice.getDefaultDeviceName());
+		this(AlDevice.getDefaultPhysicalDeviceName());
 	}
 
-	public NerdAl(final AlDevice p_device) {
-		this.context = this.createAl(p_device, new AlContext.AlContextSettings());
-		this.contextId = this.context.getId();
-	}
-
-	public NerdAl(final AlContext p_context) {
-		this.createAl(p_context);
-	}
-
+	/**
+	 * Creates an abstract, OpenAL "device" object ({@link AlDevice} instance) given
+	 * just the name of a physical device to connect to. Use
+	 * {@link AlDevice#getPhysicalDevicesNames()} to get a list of physical devices
+	 * to connect to.
+	 */
 	public NerdAl(final String p_deviceName) {
 		this.context = this.createAl(p_deviceName);
 		this.contextId = this.context.getId();
 	}
 
+	/**
+	 * @param p_device is the abstract, OpenAL "device" object ({@link AlDevice}
+	 *                 instance) to be used for making {@code alc*()} calls, and
+	 *                 creating an {@link AlContext} object.
+	 */
+	public NerdAl(final AlDevice p_device) {
+		this.context = this.createAl(p_device, new AlContext.AlContextSettings());
+		this.contextId = this.context.getId();
+	}
+
+	/**
+	 * Lets this {@link NerdAl} instance wrap the given {@link AlContext} object.
+	 *
+	 * @param p_context is the {@link AlContext} this {@link NerdAl} instance will
+	 *                  wrap.
+	 */
+	public NerdAl(final AlContext p_context) {
+		this.createAl(p_context);
+	}
+
 	public NerdAl(final AlContext.AlContextSettings p_settings) {
-		this.context = this.createAl(AlDevice.getDefaultDeviceName(), p_settings);
+		this.context = this.createAl(AlDevice.getDefaultPhysicalDeviceName(), p_settings);
 		this.contextId = this.context.getId();
 	}
 
@@ -69,6 +104,84 @@ public class NerdAl {
 		this.context = this.createAl(p_deviceName, p_settings);
 		this.contextId = this.context.getId();
 	}
+
+	// region Initialization.
+	/**
+	 * Creates an abstract, OpenAL "device" object ({@link AlDevice} instance) given
+	 * just the name of a physical device to connect to.
+	 *
+	 * @param p_deviceName is the name of the physical device.
+	 * @return The {@link AlContext} this {@link NerdAl} instance will wrap.
+	 */
+	protected AlContext createAl(final String p_deviceName) {
+		return this.createAl(p_deviceName, null);
+	}
+
+	/**
+	 * @param p_deviceName      is the name of the physical device to connect to.
+	 * @param p_contextSettings are the settings to create the {@link AlContext}
+	 *                          object to wrap.
+	 * @return The {@link AlContext} this {@link NerdAl} instance will wrap.
+	 */
+	protected AlContext createAl(final String p_deviceName, final AlContext.AlContextSettings p_contextSettings) {
+		return this.createAl(new AlDevice(this, p_deviceName), p_contextSettings);
+	}
+
+	/**
+	 * @param p_device          is the abstract, OpenAL "device" object
+	 *                          ({@link AlDevice} instance) to be used for making
+	 *                          {@code alc*()} calls.
+	 * @param p_contextSettings are the settings to create the {@link AlContext}
+	 *                          object to wrap.
+	 * @return The {@link AlContext} this {@link NerdAl} instance will wrap.
+	 */
+	protected AlContext createAl(final AlDevice p_device, final AlContext.AlContextSettings p_contextSettings) {
+		this.device = p_device;
+		return this.createAl(new AlContext(this, p_contextSettings));
+	}
+
+	/**
+	 * @param p_context is the {@link AlContext} to wrap.
+	 * @return The very exact same {@link AlContext} object!
+	 */
+	protected AlContext createAl(final AlContext p_context) {
+		this.context = p_context;
+
+		// LWJGL objects. These fetch function pointers and stuff:
+		this.alCtxCap = ALC.createCapabilities(this.getDeviceId());
+		this.alCap = AL.createCapabilities(this.alCtxCap);
+
+		// What happens when you don't create these? This!:
+		/*
+		 * """
+		 * Exception in thread "main" java.lang.ExceptionInInitializerError
+		 * at org.lwjgl.openal.AL$ICDStatic.get(AL.java:252)
+		 * AL.java:252
+		 * at org.lwjgl.openal.AL.getICD(AL.java:218)
+		 * AL.java:218
+		 * at org.lwjgl.openal.AL10.alGetError(AL10.java:143)
+		 * AL10.java:143
+		 * """
+		 *
+		 * ...
+		 * <Insert errors referencing our code here!>
+		 * ...
+		 *
+		 * """
+		 * Caused by: java.lang.IllegalStateException: No ALCapabilities instance has
+		 * been set at org.lwjgl.openal.AL$ICDStatic$WriteOnce.<clinit>(AL.java:262)
+		 * AL.java:262
+		 * ... 11 more
+		 * """
+		 */
+
+		this.checkAlError();
+		this.checkAlcError();
+
+		this.contextId = this.context.getId();
+		return this.context;
+	}
+	// endregion
 	// endregion
 
 	// Getters and setters!...:
@@ -121,7 +234,7 @@ public class NerdAl {
 	}
 	// endregion
 
-	// region ...Stuff in the `private` fields.
+	// region ...Stuff in the `protected` fields.
 	public AlDevice getDevice() {
 		return this.device;
 	}
@@ -135,7 +248,7 @@ public class NerdAl {
 	}
 
 	public String getDeviceName() {
-		return this.device.getName();
+		return this.device.getPhysicalDeviceName();
 	}
 
 	public long getContextId() {
@@ -255,8 +368,8 @@ public class NerdAl {
 
 	// region State management.
 	protected void makeContextCurrent() {
-		ALC10.alcMakeContextCurrent(this.contextId);
-
+		if (!ALC10.alcMakeContextCurrent(this.contextId))
+			throw new NerdAlException("Could not change the OpenAL context! This should not happen...");
 	}
 
 	public void framelyCallback() {
@@ -289,35 +402,6 @@ public class NerdAl {
 			if (p_alsoContexts && p_alsoDevices)
 				this.RESOURCES.clear();
 		}
-	}
-	// endregion
-
-	// region Initialization.
-	protected AlContext createAl(final String p_deviceName) {
-		return this.createAl(p_deviceName, null);
-	}
-
-	protected AlContext createAl(final String p_deviceName, final AlContext.AlContextSettings p_contextSettings) {
-		return this.createAl(new AlDevice(this, p_deviceName), p_contextSettings);
-	}
-
-	protected AlContext createAl(final AlDevice p_device, final AlContext.AlContextSettings p_contextSettings) {
-		this.device = p_device;
-		this.context = new AlContext(this, p_contextSettings);
-
-		// LWJGL objects:
-		this.alCtxCap = ALC.createCapabilities(this.getDeviceId());
-		this.alCap = AL.createCapabilities(this.alCtxCap);
-
-		this.checkAlError();
-		this.checkAlcError();
-
-		return this.context;
-	}
-
-	protected AlContext createAl(final AlContext p_context) {
-		this.context = p_context;
-		return this.context;
 	}
 	// endregion
 

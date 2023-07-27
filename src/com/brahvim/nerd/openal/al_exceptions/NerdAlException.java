@@ -3,7 +3,8 @@ package com.brahvim.nerd.openal.al_exceptions;
 /**
  * Thrown when:
  * - An error occurs within this library.
- * - An error not reported by any of OpenAL's `*GetError()` functions occurs.
+ * - An error reported by OpenAL using return values occurs.
+ * - An error not reported by any OpenAL {@code *GetError()} functions occurs.
  */
 public class NerdAlException extends RuntimeException {
 

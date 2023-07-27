@@ -81,8 +81,8 @@ public class AlAuxiliaryEffectSlot extends AlNativeResource<Integer> {
 	// region Fields.
 	protected static final Vector<AlAuxiliaryEffectSlot> ALL_INSTANCES = new Vector<>();
 
-	private AlEffect effect;
-	private AlSource source;
+	protected AlEffect effect;
+	protected AlSource source;
 	// endregion
 
 	// region Constructors.
@@ -96,6 +96,22 @@ public class AlAuxiliaryEffectSlot extends AlNativeResource<Integer> {
 	public AlAuxiliaryEffectSlot(final NerdAl p_alMan, final AlEffect p_effect) {
 		super(p_alMan);
 		super.id = EXTEfx.alGenAuxiliaryEffectSlots();
+		super.MAN.checkAlError();
+
+		this.setEffect(p_effect);
+		AlAuxiliaryEffectSlot.ALL_INSTANCES.add(this);
+	}
+
+	public AlAuxiliaryEffectSlot(final NerdAl p_alMan, final int p_id) {
+		super(p_alMan);
+		super.id = p_id;
+		super.MAN.checkAlError();
+		AlAuxiliaryEffectSlot.ALL_INSTANCES.add(this);
+	}
+
+	public AlAuxiliaryEffectSlot(final NerdAl p_alMan, final int p_id, final AlEffect p_effect) {
+		super(p_alMan);
+		super.id = p_id;
 		super.MAN.checkAlError();
 
 		this.setEffect(p_effect);
@@ -386,8 +402,6 @@ public class AlAuxiliaryEffectSlot extends AlNativeResource<Integer> {
 		this.source.setEffectSlot(null);
 		EXTEfx.alDeleteAuxiliaryEffectSlots(super.id);
 		AlAuxiliaryEffectSlot.ALL_INSTANCES.remove(this);
-
-		super.id = EXTEfx.AL_EFFECTSLOT_NULL;
 	}
 
 }

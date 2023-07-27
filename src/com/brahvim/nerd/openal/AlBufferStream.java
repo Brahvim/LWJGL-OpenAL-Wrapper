@@ -29,9 +29,9 @@ public class AlBufferStream {
 	// region Fields.
 	protected static final Vector<AlBufferStream> ALL_INSTANCES = new Vector<>();
 
-	private final NerdAl MAN;
-	private final AlSource SOURCE;
-	private final ArrayList<AlOggBuffer> USED_BUFFERS = new ArrayList<>(3), UNUSED_BUFFERS = new ArrayList<>(5);
+	protected final NerdAl MAN;
+	protected final AlSource SOURCE;
+	protected final ArrayList<AlOggBuffer> USED_BUFFERS = new ArrayList<>(3), UNUSED_BUFFERS = new ArrayList<>(5);
 	// endregion
 
 	public AlBufferStream(final NerdAl p_alMan, final AlSource p_source) {

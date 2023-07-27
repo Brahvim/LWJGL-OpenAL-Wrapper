@@ -28,15 +28,15 @@ public class AlCapture extends AlNativeResource<Long> {
 	protected static final Vector<AlCapture> ALL_INSTANCES = new Vector<>();
 
 	// This is here literally just for naming threads!:
-	private static AtomicInteger numActiveInstances = new AtomicInteger();
+	protected static AtomicInteger numActiveInstances = new AtomicInteger();
 
-	private final String deviceName;
+	protected final String deviceName;
 
-	private Thread captureThread;
-	private ByteBuffer capturedData = ByteBuffer.allocate(0);
+	protected Thread captureThread;
+	protected ByteBuffer capturedData = ByteBuffer.allocate(0);
 
 	// Last capture info:
-	private int lastCapSampleRate = -1, lastCapFormat = -1;
+	protected int lastCapSampleRate = -1, lastCapFormat = -1;
 	// endregion
 
 	// region Constructors.
@@ -67,6 +67,25 @@ public class AlCapture extends AlNativeResource<Long> {
 	// endregion
 
 	// region Capture queries.
+	public AlWavBuffer stopCapturing(final AlWavBuffer p_buffer) {
+		this.stopCapturing();
+		this.storeIntoBuffer(p_buffer);
+		return p_buffer;
+	}
+
+	public synchronized ByteBuffer stopCapturing() {
+		if (this.captureThread == null || !this.captureThread.isAlive())
+			return this.capturedData;
+
+		this.captureThread.interrupt();
+
+		ALC11.alcCaptureCloseDevice(super.id);
+		super.MAN.checkAlcError();
+
+		AlCapture.numActiveInstances.decrementAndGet();
+		return this.capturedData;
+	}
+
 	public static String getDefaultDeviceName() {
 		return ALC10.alcGetString(0, ALC11.ALC_CAPTURE_DEFAULT_DEVICE_SPECIFIER);
 	}
@@ -86,11 +105,18 @@ public class AlCapture extends AlNativeResource<Long> {
 
 	public synchronized void startCapturing(final int p_sampleRate, final int p_format, final int p_samplesPerBuffer) {
 		if (this.isCapturing()) {
-			System.err.println("OpenAL cannot start capturing whilst already doing it!");
+			System.err.printf(
+					"An instance of `%s` cannot start capturing whilst already doing it!%n",
+					this.getClass().getName());
 			return;
 		}
 
 		AlCapture.numActiveInstances.incrementAndGet();
+		this.startCapturingImpl(p_sampleRate, p_format, p_samplesPerBuffer);
+	}
+
+	protected synchronized void startCapturingImpl(
+			final int p_sampleRate, final int p_format, final int p_samplesPerBuffer) {
 
 		// region Preparing to capture.
 		// Store the last ones.
@@ -149,7 +175,7 @@ public class AlCapture extends AlNativeResource<Long> {
 			}
 		});
 
-		this.captureThread.setName("OpenAL capture thread #" + AlCapture.numActiveInstances);
+		this.captureThread.setName("OpenAlCaptureThread#" + AlCapture.numActiveInstances);
 		this.captureThread.start();
 	}
 	// endregion
@@ -161,25 +187,6 @@ public class AlCapture extends AlNativeResource<Long> {
 	public boolean isCapturing() {
 		// return this.captureThread == null ? false : this.captureThread.isAlive();
 		return this.captureThread != null && this.captureThread.isAlive();
-	}
-
-	public AlWavBuffer stopCapturing(final AlWavBuffer p_buffer) {
-		this.stopCapturing();
-		this.storeIntoBuffer(p_buffer);
-		return p_buffer;
-	}
-
-	public synchronized ByteBuffer stopCapturing() {
-		if (this.captureThread == null || !this.captureThread.isAlive())
-			return this.capturedData;
-
-		this.captureThread.interrupt();
-
-		ALC11.alcCaptureCloseDevice(super.id);
-		super.MAN.checkAlcError();
-
-		AlCapture.numActiveInstances.decrementAndGet();
-		return this.capturedData;
 	}
 	// endregion
 

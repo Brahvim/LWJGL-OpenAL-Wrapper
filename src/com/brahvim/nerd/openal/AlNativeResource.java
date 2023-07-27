@@ -1,6 +1,7 @@
 package com.brahvim.nerd.openal;
 
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Vector;
 
 public abstract class AlNativeResource<IdT extends Number> /* implements Closeable */ {
@@ -11,10 +12,12 @@ public abstract class AlNativeResource<IdT extends Number> /* implements Closeab
 	protected IdT id;
 	protected boolean hasDisposed, willDispose = true;
 
-	private static final Vector<AlNativeResource<?>> ALL_INSTANCES = new Vector<>(2);
+	protected static final Vector<AlNativeResource<?>> ALL_INSTANCES = new Vector<>(2);
 
 	protected AlNativeResource(final NerdAl p_alMan) {
-		this.MAN = p_alMan;
+		this.MAN = Objects.requireNonNull(p_alMan, String.format(
+				"Cannot construct any OpenAL object wrapper from `com.brahvim.nerd.openal` with a `null` `%s` instance.",
+				NerdAl.class.getSimpleName()));
 		this.MAN.RESOURCES.add(this);
 		AlNativeResource.ALL_INSTANCES.add(this);
 	}
@@ -36,6 +39,11 @@ public abstract class AlNativeResource<IdT extends Number> /* implements Closeab
 
 	public NerdAl getAlMan() {
 		return this.MAN;
+	}
+
+	@SuppressWarnings("unchecked")
+	public IdT getNullObjectId() {
+		return (IdT) (Number) 0L;
 	}
 
 	protected void framelyCallback() {
