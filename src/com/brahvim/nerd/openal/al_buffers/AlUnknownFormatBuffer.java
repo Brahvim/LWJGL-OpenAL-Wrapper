@@ -6,8 +6,8 @@ import java.nio.ByteBuffer;
 
 import org.lwjgl.openal.AL10;
 
-import com.brahvim.nerd.openal.AlBuffer;
-import com.brahvim.nerd.openal.NerdAl;
+import com.brahvim.nerd.openal.objects.AlBuffer;
+import com.brahvim.nerd.openal.objects.NerdAl;
 
 public class AlUnknownFormatBuffer extends AlBuffer<Buffer> {
 

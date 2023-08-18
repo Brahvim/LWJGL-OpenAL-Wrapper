@@ -1,8 +1,9 @@
-package com.brahvim.nerd.openal;
+package com.brahvim.nerd.openal.objects;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 import org.lwjgl.openal.AL10;
@@ -27,7 +28,7 @@ public class AlBufferStream {
 	// but without a handle to the thing operating. Not `java.io.Closeable`, though!
 
 	// region Fields.
-	protected static final Vector<AlBufferStream> ALL_INSTANCES = new Vector<>();
+	protected static final Vector<AlBufferStream> ALL_INSTANCES = new Vector<>(0);
 
 	protected final NerdAl MAN;
 	protected final AlSource SOURCE;
@@ -76,7 +77,7 @@ public class AlBufferStream {
 		this.MAN.checkAlError();
 	}
 
-	public ArrayList<AlOggBuffer> getAlBuffers() {
+	public List<AlOggBuffer> getAlBuffers() {
 		return new ArrayList<>(this.USED_BUFFERS);
 	}
 

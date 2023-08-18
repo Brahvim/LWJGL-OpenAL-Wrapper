@@ -3,12 +3,12 @@ package com.brahvim.nerd.openal.al_exceptions;
 /**
  * A "base class" for exceptions in this library that represent OpenAL errors.
  */
-public abstract class NerdAbstractOpenAlException extends RuntimeException {
+public abstract class AbstractAlException extends RuntimeException {
 
 	protected final int ERROR_CODE;
 	protected final String ERROR_STRING;
 
-	protected NerdAbstractOpenAlException(final String p_message, final int p_alErrorCode) {
+	protected AbstractAlException(final String p_message, final int p_alErrorCode) {
 		super("\"" + p_message + "\""
 				+ " - Error Code: `"
 				+ p_alErrorCode

@@ -1,8 +1,9 @@
-package com.brahvim.nerd.openal;
+package com.brahvim.nerd.openal.objects;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Vector;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -21,16 +22,13 @@ import com.brahvim.nerd.openal.al_exceptions.AlcException;
 @Deprecated
 public class AlCapture extends AlNativeResource<Long> {
 
-	// Y'know what?
-	// Using different OpenAL contexts probably doesn't matter here.
-
 	// region Fields.
-	protected static final Vector<AlCapture> ALL_INSTANCES = new Vector<>();
+	protected static final Vector<AlCapture> ALL_INSTANCES = new Vector<>(0);
 
 	// This is here literally just for naming threads!:
-	protected static AtomicInteger numActiveInstances = new AtomicInteger();
+	protected static final AtomicInteger NUM_ACTIVE_INSTANCES = new AtomicInteger();
 
-	protected final String deviceName;
+	protected final String physicalDeviceName;
 
 	protected Thread captureThread;
 	protected ByteBuffer capturedData = ByteBuffer.allocate(0);
@@ -47,13 +45,13 @@ public class AlCapture extends AlNativeResource<Long> {
 
 	public AlCapture(final NerdAl p_alMan, final String p_deviceName) {
 		super(p_alMan);
-		this.deviceName = p_deviceName;
 		AlCapture.ALL_INSTANCES.add(this);
+		this.physicalDeviceName = p_deviceName;
 	}
 	// endregion
 
 	// region Instance management.
-	public static ArrayList<AlCapture> getAllInstances() {
+	public static List<AlCapture> getAllInstances() {
 		return new ArrayList<>(AlCapture.ALL_INSTANCES);
 	}
 
@@ -62,7 +60,7 @@ public class AlCapture extends AlNativeResource<Long> {
 	}
 
 	public static int getNumInstancesCurrentlyCapturing() {
-		return AlCapture.numActiveInstances.get();
+		return AlCapture.NUM_ACTIVE_INSTANCES.get();
 	}
 	// endregion
 
@@ -82,7 +80,7 @@ public class AlCapture extends AlNativeResource<Long> {
 		ALC11.alcCaptureCloseDevice(super.id);
 		super.MAN.checkAlcError();
 
-		AlCapture.numActiveInstances.decrementAndGet();
+		AlCapture.NUM_ACTIVE_INSTANCES.decrementAndGet();
 		return this.capturedData;
 	}
 
@@ -111,7 +109,7 @@ public class AlCapture extends AlNativeResource<Long> {
 			return;
 		}
 
-		AlCapture.numActiveInstances.incrementAndGet();
+		AlCapture.NUM_ACTIVE_INSTANCES.incrementAndGet();
 		this.startCapturingImpl(p_sampleRate, p_format, p_samplesPerBuffer);
 	}
 
@@ -124,7 +122,7 @@ public class AlCapture extends AlNativeResource<Long> {
 		this.lastCapSampleRate = p_sampleRate;
 
 		// Open the capture device,
-		super.id = ALC11.alcCaptureOpenDevice(this.deviceName, p_sampleRate, p_format, p_samplesPerBuffer);
+		super.id = ALC11.alcCaptureOpenDevice(this.physicalDeviceName, p_sampleRate, p_format, p_samplesPerBuffer);
 		super.MAN.checkAlcError();
 
 		// Begin capturing!:
@@ -154,7 +152,7 @@ public class AlCapture extends AlNativeResource<Long> {
 				} catch (final AlcException e) {
 					deviceGotRemoved = true;
 					System.err.printf("""
-							Audio capture device on thread \"%s\" has been disconnected amidst a session.
+							Audio capture device on thread "%s" has been disconnected amidst a session.
 							Recording has stopped.""", this.captureThread.getName());
 					this.captureThread.interrupt();
 				}
@@ -175,7 +173,7 @@ public class AlCapture extends AlNativeResource<Long> {
 			}
 		});
 
-		this.captureThread.setName("OpenAlCaptureThread#" + AlCapture.numActiveInstances);
+		this.captureThread.setName("OpenAlCaptureThread#" + AlCapture.NUM_ACTIVE_INSTANCES);
 		this.captureThread.start();
 	}
 	// endregion

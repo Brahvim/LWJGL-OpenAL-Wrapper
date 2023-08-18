@@ -2,8 +2,8 @@ package com.brahvim.nerd.openal.al_ext_efx.al_filter;
 
 import org.lwjgl.openal.EXTEfx;
 
-import com.brahvim.nerd.openal.AlFilter;
-import com.brahvim.nerd.openal.NerdAl;
+import com.brahvim.nerd.openal.objects.AlFilter;
+import com.brahvim.nerd.openal.objects.NerdAl;
 
 public class AlLowpassFilter extends AlFilter {
 

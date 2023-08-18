@@ -1,8 +1,9 @@
-package com.brahvim.nerd.openal;
+package com.brahvim.nerd.openal.objects;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 import org.lwjgl.openal.EXTEfx;
@@ -11,16 +12,33 @@ import org.lwjgl.system.MemoryStack;
 public abstract class AlEffect extends AlNativeResource<Integer> {
 
 	// region Fields.
-	protected static final Vector<AlEffect> ALL_INSTANCES = new Vector<>();
+	protected static final Vector<AlEffect> ALL_INSTANCES = new Vector<>(0);
 
 	protected AlAuxiliaryEffectSlot slot;
 	// endregion
 
 	protected AlEffect(final NerdAl p_alMan) {
 		super(p_alMan);
-		AlEffect.ALL_INSTANCES.add(this);
+		this.slot = super.MAN.DEFAULTS.auxiliaryEffectSlot;
 
 		super.id = EXTEfx.alGenEffects();
+		this.setInt(EXTEfx.AL_EFFECT_TYPE, this.getEffectType());
+		super.MAN.checkAlError();
+		AlEffect.ALL_INSTANCES.add(this);
+	}
+
+	// I really wish these objects could have constructors that took in IDs of
+	// objects which did not have a `NerdAl` wrapper available, then literally
+	// create the entire 'wrapper empire' this library lets you build, and let you
+	// borrow those objects back with all the getters you get - <sigh>.
+	protected AlEffect(final NerdAl p_alMan, final int p_id) {
+		super(p_alMan);
+		AlEffect.ALL_INSTANCES.add(this);
+		this.slot = super.MAN.DEFAULTS.auxiliaryEffectSlot;
+
+		if (super.MAN.isEffect(p_id))
+			super.id = EXTEfx.alGenEffects();
+
 		this.setInt(EXTEfx.AL_EFFECT_TYPE, this.getEffectType());
 		super.MAN.checkAlError();
 	}
@@ -30,7 +48,7 @@ public abstract class AlEffect extends AlNativeResource<Integer> {
 		return AlEffect.ALL_INSTANCES.size();
 	}
 
-	public static ArrayList<AlEffect> getAllInstances() {
+	public static List<AlEffect> getAllInstances() {
 		return new ArrayList<>(AlEffect.ALL_INSTANCES);
 	}
 	// endregion
@@ -108,9 +126,10 @@ public abstract class AlEffect extends AlNativeResource<Integer> {
 	// region C-style OpenAL setters.
 	public void setInt(final int p_alEnum, final int p_value) {
 		EXTEfx.alEffecti(super.id, p_alEnum, p_value);
+		super.MAN.checkAlError();
+
 		if (this.slot != null)
 			this.slot.setEffect(this);
-		super.MAN.checkAlError();
 	}
 
 	public void setIntVector(final int p_alEnum, final int... p_values) {

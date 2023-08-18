@@ -1,7 +1,7 @@
-package com.brahvim.nerd.openal;
+package com.brahvim.nerd.openal.objects;
 
 import java.util.ArrayList;
-import java.util.Objects;
+import java.util.List;
 import java.util.Vector;
 
 public abstract class AlNativeResource<IdT extends Number> /* implements Closeable */ {
@@ -9,15 +9,14 @@ public abstract class AlNativeResource<IdT extends Number> /* implements Closeab
 	// region Fields and constructor.
 	protected final NerdAl MAN;
 
-	protected IdT id;
+	@SuppressWarnings("unchecked")
+	protected IdT id = (IdT) (Number) 0;
 	protected boolean hasDisposed, willDispose = true;
 
 	protected static final Vector<AlNativeResource<?>> ALL_INSTANCES = new Vector<>(2);
 
 	protected AlNativeResource(final NerdAl p_alMan) {
-		this.MAN = Objects.requireNonNull(p_alMan, String.format(
-				"Cannot construct any OpenAL object wrapper from `com.brahvim.nerd.openal` with a `null` `%s` instance.",
-				NerdAl.class.getSimpleName()));
+		this.MAN = p_alMan;
 		this.MAN.RESOURCES.add(this);
 		AlNativeResource.ALL_INSTANCES.add(this);
 	}
@@ -28,22 +27,17 @@ public abstract class AlNativeResource<IdT extends Number> /* implements Closeab
 		return AlNativeResource.ALL_INSTANCES.size();
 	}
 
-	public static ArrayList<AlNativeResource<?>> getResourcesCopy() {
+	public static List<AlNativeResource<?>> getResourcesCopy() {
 		return new ArrayList<>(AlNativeResource.ALL_INSTANCES);
 	}
 	// endregion
 
 	public IdT getId() {
-		return id;
+		return this.id;
 	}
 
 	public NerdAl getAlMan() {
 		return this.MAN;
-	}
-
-	@SuppressWarnings("unchecked")
-	public IdT getNullObjectId() {
-		return (IdT) (Number) 0L;
 	}
 
 	protected void framelyCallback() {
@@ -64,10 +58,11 @@ public abstract class AlNativeResource<IdT extends Number> /* implements Closeab
 		if (!this.willDispose)
 			return;
 
-		// They're the same, so-uhh,
+		// This method does what I want the exact same way, so-uhh...
 		this.disposeForcibly();
 	}
 
+	@SuppressWarnings("unchecked")
 	public final void disposeForcibly() {
 		if (this.hasDisposed)
 			return;
@@ -76,6 +71,8 @@ public abstract class AlNativeResource<IdT extends Number> /* implements Closeab
 		this.hasDisposed = true;
 		this.MAN.RESOURCES.remove(this);
 		AlNativeResource.ALL_INSTANCES.remove(this);
+
+		this.id = (IdT) (Number) 0;
 	}
 
 	protected abstract void disposeImpl();

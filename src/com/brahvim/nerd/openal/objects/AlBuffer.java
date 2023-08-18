@@ -1,10 +1,11 @@
-package com.brahvim.nerd.openal;
+package com.brahvim.nerd.openal.objects;
 
 import java.io.File;
 import java.nio.Buffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 import org.lwjgl.openal.AL10;
@@ -18,7 +19,7 @@ import org.lwjgl.system.MemoryStack;
 public abstract class AlBuffer<BufferT extends Buffer> extends AlNativeResource<Integer> {
 
 	// region Fields.
-	protected static final Vector<AlBuffer<?>> ALL_INSTANCES = new Vector<>();
+	protected static final Vector<AlBuffer<?>> ALL_INSTANCES = new Vector<>(0);
 
 	// No OpenAL implementation provides `AL_DATA`.
 	// Storing it here!
@@ -55,7 +56,7 @@ public abstract class AlBuffer<BufferT extends Buffer> extends AlNativeResource<
 	protected AlBuffer(final NerdAl p_alMan, final int p_id) {
 		super(p_alMan);
 
-		if (!NerdAl.isBuffer(p_id))
+		if (!super.MAN.isBuffer(p_id))
 			throw new IllegalArgumentException("`AlBuffer::AlBuffer(NerdAL, int)` received an invalid buffer ID.");
 
 		AlBuffer.ALL_INSTANCES.add(this);
@@ -68,7 +69,7 @@ public abstract class AlBuffer<BufferT extends Buffer> extends AlNativeResource<
 		return AlBuffer.ALL_INSTANCES.size();
 	}
 
-	public static ArrayList<AlBuffer<?>> getAllInstances() {
+	public static List<AlBuffer<?>> getAllInstances() {
 		return new ArrayList<>(AlBuffer.ALL_INSTANCES);
 	}
 	// endregion
@@ -85,7 +86,7 @@ public abstract class AlBuffer<BufferT extends Buffer> extends AlNativeResource<
 		return this;
 	}
 
-	protected abstract AlBuffer<?> loadFromImpl(File p_file);
+	protected abstract AlBuffer<?> loadFromImpl(final File p_file);
 
 	public void setData(final int p_format, final BufferT p_buffer, final int p_sampleRate) {
 		this.data = p_buffer;

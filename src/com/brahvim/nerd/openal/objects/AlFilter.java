@@ -1,8 +1,9 @@
-package com.brahvim.nerd.openal;
+package com.brahvim.nerd.openal.objects;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 import org.lwjgl.openal.EXTEfx;
@@ -10,7 +11,7 @@ import org.lwjgl.system.MemoryStack;
 
 public abstract class AlFilter extends AlNativeResource<Integer> {
 
-	protected static final Vector<AlFilter> ALL_INSTANCES = new Vector<>();
+	protected static final Vector<AlFilter> ALL_INSTANCES = new Vector<>(0);
 
 	protected AlFilter(final NerdAl p_alMan) {
 		super(p_alMan);
@@ -24,6 +25,18 @@ public abstract class AlFilter extends AlNativeResource<Integer> {
 		super.MAN.checkAlError();
 	}
 
+	protected AlFilter(final NerdAl p_alMan, final int p_id) {
+		super(p_alMan);
+		AlFilter.ALL_INSTANCES.add(this);
+		super.MAN.RESOURCES.add(this);
+
+		super.id = p_id;
+		super.MAN.checkAlError();
+
+		this.setInt(EXTEfx.AL_FILTER_TYPE, this.getName());
+		super.MAN.checkAlError();
+	}
+
 	public abstract int getName();
 
 	// region Instance collection queries.
@@ -31,7 +44,7 @@ public abstract class AlFilter extends AlNativeResource<Integer> {
 		return AlFilter.ALL_INSTANCES.size();
 	}
 
-	public static ArrayList<AlFilter> getAllInstances() {
+	public static List<AlFilter> getAllInstances() {
 		return new ArrayList<>(AlFilter.ALL_INSTANCES);
 	}
 	// endregion

@@ -1,9 +1,10 @@
-package com.brahvim.nerd.openal;
+package com.brahvim.nerd.openal.objects;
 
 import java.nio.Buffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Vector;
 
@@ -12,8 +13,8 @@ import org.lwjgl.openal.AL11;
 import org.lwjgl.openal.EXTEfx;
 import org.lwjgl.system.MemoryStack;
 
-import com.brahvim.nerd.openal.al_buffers.AlUnknownFormatBuffer;
 import com.brahvim.nerd.openal.al_buffers.AlOggBuffer;
+import com.brahvim.nerd.openal.al_buffers.AlUnknownFormatBuffer;
 
 public class AlSource extends AlNativeResource<Integer> {
 
@@ -36,26 +37,26 @@ public class AlSource extends AlNativeResource<Integer> {
 	protected AlFilter directFilter, auxiliarySendFilter;
 	// endregion
 
-	// region Constructors.
+	// region Construction.
+	/**
+	 * Allocates a new OpenAL source object natively.
+	 *
+	 * @param p_alMan is the OpenAL context wrapper whose {@link AlContext} is used.
+	 */
 	public AlSource(final NerdAl p_alMan) {
 		super(p_alMan);
-		super.MAN.makeContextCurrent();
-		super.MAN.checkAlcError();
-
-		super.id = AL10.alGenSources();
-		super.MAN.checkAlError();
-
-		AlSource.ALL_INSTANCES.add(this);
+		super.id = this.createNativeSource();
 	}
 
+	/**
+	 * Allocates natively, a new {@link AlSource} that matches the one provided.
+	 *
+	 * @param p_source is the {@link AlSource} object to copy.
+	 */
 	public AlSource(final AlSource p_source) {
-		super(p_source.MAN);
-		super.MAN.makeContextCurrent();
-		super.MAN.checkAlcError();
-		super.id = AL10.alGenSources();
-		super.MAN.checkAlError();
+		this(p_source.MAN);
 
-		// region Transfer properties over (hopefully, the JIT inlines!):
+		// region Transfer properties over (hopefully, the JIT speeds this up!):
 		// this.setSourceType(p_source.getSourceType()); // Disallowed by OpenAL!
 
 		this.setBuffer(p_source.buffer);
@@ -83,12 +84,40 @@ public class AlSource extends AlNativeResource<Integer> {
 		this.setAuxiliarySendFilterGainHfAuto(p_source.getAuxiliarySendFilterGainHfAuto());
 		// endregion
 
-		AlSource.ALL_INSTANCES.add(this);
+	}
+
+	/**
+	 * Wraps a native OpenAL source object given its ID and the context containing
+	 * it.
+	 *
+	 * @param p_alMan is the OpenAL library object providing the OpenAL context
+	 *                object.
+	 * @param p_id
+	 */
+	public AlSource(final NerdAl p_alMan, final int p_id) {
+		super(p_alMan);
+		super.id = super.MAN.isSource(p_id) ? p_id : this.createNativeSource();
 	}
 
 	public AlSource(final NerdAl p_alMan, final AlBuffer<?> p_buffer) {
 		this(p_alMan);
 		this.setBuffer(p_buffer);
+	}
+
+	/**
+	 * This method allocates an OpenAL source object natively.
+	 *
+	 * @return The ID of said OpenAL source object.
+	 */
+	protected int createNativeSource() {
+		super.MAN.makeContextCurrent();
+
+		final int toRet = AL10.alGenSources();
+		super.MAN.checkAlError();
+
+		AlSource.ALL_INSTANCES.add(this);
+
+		return toRet;
 	}
 	// endregion
 
@@ -97,26 +126,26 @@ public class AlSource extends AlNativeResource<Integer> {
 		return AlSource.ALL_INSTANCES.size();
 	}
 
-	public static ArrayList<AlSource> getAllInstances() {
+	public static List<AlSource> getAllInstances() {
 		return new ArrayList<>(AlSource.ALL_INSTANCES);
 	}
 	// endregion
 
 	// region ...literal "buffer distribution", :joy:
 	@SuppressWarnings({ "unchecked", "deprecation" })
-	public <T extends Buffer> AlBuffer<T> getBuffer() {
+	public <RetT extends Buffer> AlBuffer<RetT> getBuffer() {
 		final int bufferId = this.getInt(AL10.AL_BUFFER);
 		if (bufferId == this.buffer.getId())
-			return (AlBuffer<T>) this.buffer;
+			return (AlBuffer<RetT>) this.buffer;
 
 		if (this.buffer instanceof AlOggBuffer)
-			return (AlBuffer<T>) this.buffer;
+			return (AlBuffer<RetT>) this.buffer;
 		else if (this.buffer instanceof com.brahvim.nerd.openal.al_buffers.AlWavBuffer)
-			return (AlBuffer<T>) this.buffer;
+			return (AlBuffer<RetT>) this.buffer;
 		else if (this.buffer instanceof com.brahvim.nerd.openal.al_buffers.AlMp3Buffer)
-			return (AlBuffer<T>) this.buffer;
+			return (AlBuffer<RetT>) this.buffer;
 		else
-			return (AlBuffer<T>) new AlUnknownFormatBuffer(super.MAN, bufferId);
+			return (AlBuffer<RetT>) new AlUnknownFormatBuffer(super.MAN, bufferId);
 	}
 
 	public AlSource setBuffer(final AlBuffer<?> p_buffer) {
@@ -130,7 +159,6 @@ public class AlSource extends AlNativeResource<Integer> {
 	public int getInt(final int p_alEnum) {
 		super.MAN.makeContextCurrent();
 		super.MAN.checkAlcError();
-
 		if (super.hasDisposed)
 			return Integer.MIN_VALUE;
 

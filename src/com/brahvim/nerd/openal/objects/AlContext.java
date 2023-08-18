@@ -1,59 +1,91 @@
-package com.brahvim.nerd.openal;
+package com.brahvim.nerd.openal.objects;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
+import org.lwjgl.openal.AL;
 import org.lwjgl.openal.AL10;
 import org.lwjgl.openal.AL11;
+import org.lwjgl.openal.ALC;
 import org.lwjgl.openal.ALC10;
-import org.lwjgl.openal.ALC11;
+import org.lwjgl.openal.ALCCapabilities;
+import org.lwjgl.openal.ALCapabilities;
 import org.lwjgl.openal.EXTEfx;
 import org.lwjgl.system.MemoryStack;
 
 import com.brahvim.nerd.openal.al_exceptions.AlException;
+import com.brahvim.nerd.openal.al_exceptions.AlUnflaggedException;
+import com.brahvim.nerd.openal.al_exceptions.AlWrapperException;
 import com.brahvim.nerd.openal.al_exceptions.AlcException;
-import com.brahvim.nerd.openal.al_exceptions.NerdAlException;
 
 public class AlContext extends AlNativeResource<Long> {
 
-	public static class AlContextSettings {
-
-		// OpenAL default values:
-		public int frequency = 44100, monoSources = 32, stereoSources = 8, refresh = 40;
-		public boolean sync; // `false` by default for OpenAL.
-
-		public int[] asAttribArray() {
-			return new int[] {
-					ALC10.ALC_FREQUENCY, this.frequency,
-					ALC11.ALC_MONO_SOURCES, this.monoSources,
-					ALC11.ALC_STEREO_SOURCES, this.stereoSources,
-					ALC10.ALC_REFRESH, this.refresh,
-					ALC10.ALC_SYNC, this.sync ? ALC10.ALC_TRUE : ALC10.ALC_FALSE,
-			};
-		}
-
-	}
-
 	// region Fields.
-	protected static final Vector<AlContext> ALL_INSTANCES = new Vector<>();
+	protected static final Vector<AlContext> ALL_INSTANCES = new Vector<>(1);
 
-	protected final AlDevice DEVICE;
+	protected final ALCapabilities AL_CAPABILITIES;
+	protected final ALCCapabilities ALC_CAPABILITIES;
 	// endregion
 
 	// region Constructors.
 	public AlContext(final NerdAl p_alMan) {
-		this(p_alMan, new AlContext.AlContextSettings());
+		this(p_alMan, new AlContextSettings());
 	}
 
-	public AlContext(final NerdAl p_alMan, final AlContext.AlContextSettings p_settings) {
+	public AlContext(final NerdAl p_alMan, final long p_id) throws AlWrapperException {
 		super(p_alMan);
+		super.id = p_id;
 
-		this.DEVICE = p_alMan.getDevice();
-		super.id = this.createCtx(p_settings);
+		final long currentContextId = ALC10.alcGetCurrentContext();
+
+		try {
+			if (!ALC10.alcMakeContextCurrent(p_id))
+				throw new AlWrapperException();
+		} finally {
+			ALC10.alcMakeContextCurrent(currentContextId);
+		}
+
+		this.ALC_CAPABILITIES = ALC.createCapabilities(this.getDevice().getId());
+		this.AL_CAPABILITIES = AL.createCapabilities(this.ALC_CAPABILITIES);
 
 		AlContext.ALL_INSTANCES.add(this);
+	}
+
+	public AlContext(final NerdAl p_alMan, final AlContextSettings p_settings) {
+		super(p_alMan);
+		super.id = this.createNativeContext(p_settings);
+
+		this.ALC_CAPABILITIES = ALC.createCapabilities(this.getDevice().getId());
+		this.AL_CAPABILITIES = AL.createCapabilities(this.ALC_CAPABILITIES);
+
+		AlContext.ALL_INSTANCES.add(this);
+	}
+
+	protected long createNativeContext(AlContextSettings p_settings) {
+		// Finally, a `null` check!:
+
+		if (p_settings == null) {
+			// System.err.println(
+			// "`AlContext::AlContext(NerdAl, AlContext.AlContextSettings)` received a
+			// `null` settings object.");
+			p_settings = new AlContextSettings();
+		}
+
+		final long toRet = ALC10.alcCreateContext(this.getDevice().getId(), p_settings.asAttribArray());
+		// ^^^ `toRet` will be `0` if the call fails.
+		this.checkAlcError();
+
+		// Placing the check into a boolean to check for errors right away!
+		final boolean ctxVerifiedStatus = ALC10.alcMakeContextCurrent(toRet);
+		this.checkAlcError();
+
+		if (toRet == 0 || !ctxVerifiedStatus)
+			super.dispose();
+
+		return toRet;
 	}
 	// endregion
 
@@ -62,14 +94,22 @@ public class AlContext extends AlNativeResource<Long> {
 		return AlContext.ALL_INSTANCES.size();
 	}
 
-	public static ArrayList<AlContext> getAllInstances() {
+	public static List<AlContext> getAllInstances() {
 		return new ArrayList<>(AlContext.ALL_INSTANCES);
 	}
 	// endregion
 
 	// region Getters.
 	public AlDevice getDevice() {
-		return this.DEVICE;
+		return super.MAN.getDevice();
+	}
+
+	public ALCapabilities getLwjglAlCapabilities() {
+		return this.AL_CAPABILITIES;
+	}
+
+	public ALCCapabilities getLwjglAlcCapabilities() {
+		return this.ALC_CAPABILITIES;
 	}
 	// endregion
 
@@ -347,42 +387,19 @@ public class AlContext extends AlNativeResource<Long> {
 	// endregion
 
 	public int checkAlcError() {
-		final int errorCode = ALC10.alcGetError(this.DEVICE.getId());
+		final int errorCode = ALC10.alcGetError(this.getDevice().getId());
 
 		if (errorCode != 0)
-			throw new AlcException(this.DEVICE.getId(), errorCode);
+			throw new AlcException(this.getDevice().getId(), errorCode);
 
 		return errorCode;
-	}
-
-	protected long createCtx(AlContext.AlContextSettings p_settings) {
-		// Finally, a `null` check!:
-
-		if (p_settings == null) {
-			// System.err.println(
-			// "`AlContext::AlContext(NerdAl, AlContext.AlContextSettings)` received a
-			// `null` settings object.");
-			p_settings = new AlContextSettings();
-		}
-
-		final long toRet = ALC10.alcCreateContext(this.DEVICE.getId(), p_settings.asAttribArray());
-		this.checkAlcError();
-
-		// Placing the check into a boolean to check for errors right away!
-		final boolean ctxVerifiedStatus = ALC10.alcMakeContextCurrent(toRet);
-		this.checkAlcError();
-
-		if (toRet == 0 || !ctxVerifiedStatus)
-			super.dispose();
-
-		return toRet;
 	}
 
 	@Override
 	protected void disposeImpl() {
 		// Unlink the current context object:
 		if (!ALC10.alcMakeContextCurrent(0))
-			throw new NerdAlException("Could not change the OpenAL context (whilst disposing one)!");
+			throw new AlUnflaggedException("Could not change the OpenAL context (whilst disposing one)!");
 
 		this.checkAlcError();
 

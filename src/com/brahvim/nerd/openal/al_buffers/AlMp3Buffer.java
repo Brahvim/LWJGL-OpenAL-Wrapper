@@ -13,8 +13,8 @@ import javax.sound.sampled.AudioFormat;
 
 import org.lwjgl.openal.AL10;
 
-import com.brahvim.nerd.openal.AlBuffer;
-import com.brahvim.nerd.openal.NerdAl;
+import com.brahvim.nerd.openal.objects.AlBuffer;
+import com.brahvim.nerd.openal.objects.NerdAl;
 
 import fr.delthas.javamp3.Mp3InputStream;
 
@@ -25,7 +25,7 @@ import fr.delthas.javamp3.Mp3InputStream;
 @Deprecated
 public class AlMp3Buffer extends AlBuffer<IntBuffer> {
 
-	protected static final Vector<AlMp3Buffer> ALL_INSTANCES = new Vector<>();
+	protected static final Vector<AlMp3Buffer> ALL_INSTANCES = new Vector<>(0);
 
 	// region Constructors.
 	public AlMp3Buffer(final NerdAl p_alMan) {
@@ -77,7 +77,7 @@ public class AlMp3Buffer extends AlBuffer<IntBuffer> {
 		}
 
 		if (format == null)
-			return null;
+			return this;
 
 		AL10.alBufferData(super.id,
 				super.alFormat = format.getChannels() == 1

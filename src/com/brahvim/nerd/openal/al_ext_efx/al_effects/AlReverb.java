@@ -3,8 +3,8 @@ package com.brahvim.nerd.openal.al_ext_efx.al_effects;
 import org.lwjgl.openal.AL10;
 import org.lwjgl.openal.EXTEfx;
 
-import com.brahvim.nerd.openal.AlEffect;
-import com.brahvim.nerd.openal.NerdAl;
+import com.brahvim.nerd.openal.objects.AlEffect;
+import com.brahvim.nerd.openal.objects.NerdAl;
 
 public class AlReverb extends AlEffect {
 

@@ -1,4 +1,4 @@
-package com.brahvim.nerd.openal;
+package com.brahvim.nerd.openal.objects;
 
 import java.io.File;
 import java.nio.FloatBuffer;
@@ -16,10 +16,17 @@ import org.lwjgl.openal.EXTEfx;
 import org.lwjgl.system.MemoryStack;
 
 import com.brahvim.nerd.openal.al_buffers.AlOggBuffer;
+import com.brahvim.nerd.openal.al_exceptions.AbstractAlException;
 import com.brahvim.nerd.openal.al_exceptions.AlException;
+import com.brahvim.nerd.openal.al_exceptions.AlUnflaggedException;
 import com.brahvim.nerd.openal.al_exceptions.AlcException;
-import com.brahvim.nerd.openal.al_exceptions.NerdAbstractOpenAlException;
-import com.brahvim.nerd.openal.al_exceptions.NerdAlException;
+import com.brahvim.nerd.openal.null_objects.AlNullAuxiliaryEffectSlot;
+import com.brahvim.nerd.openal.null_objects.AlNullBuffer;
+import com.brahvim.nerd.openal.null_objects.AlNullContext;
+import com.brahvim.nerd.openal.null_objects.AlNullDevice;
+import com.brahvim.nerd.openal.null_objects.AlNullEffect;
+import com.brahvim.nerd.openal.null_objects.AlNullFilter;
+import com.brahvim.nerd.openal.null_objects.AlNullSource;
 
 /**
  * Wrapper to sit on top of an {@link AlContext} to allow access to
@@ -28,19 +35,102 @@ import com.brahvim.nerd.openal.al_exceptions.NerdAlException;
 public class NerdAl {
 
 	// Test using `main()`:
-	/*
-	 * public static void main(final String[] p_args) {
-	 * final NerdAl al = new NerdAl();
-	 * System.out.println("Created a `NerdAl` instance!");
-	 * al.makeContextCurrent();
-	 * System.out.println("Exiting, ba-bye!");
-	 * }
+	public static void main(final String[] p_args) {
+		final NerdAl al1 = new NerdAl(), al2 = new NerdAl();
+		System.out.println("Created a `NerdAl` instance!");
+		al1.makeContextCurrent();
+		al2.makeContextCurrent();
+
+		final AlSource source = new AlSource(al2);
+		source.setEffectSlot(new AlAuxiliaryEffectSlot(al2));
+		source.playThenDispose();
+
+		al1.disposeAllResources();
+		al2.disposeAllResources();
+		System.out.println("Exiting, ba-bye!");
+	}
+
+	/**
+	 * An enum listing all OpenAL extensions this library uses. Any OpenAL drivers
+	 * ("implementations") you use with this library, need to support them too.
 	 */
+	public enum NerdAlExtensionsInfo {
+
+		/**
+		 * Refers to {@code ALC_EXT_EFX}, the "OpenAL Effects Extension".
+		 */
+		EXT_EFFECTS("ALC_EXT_EFX"),
+
+		/**
+		 * Refers to {@code ALC_EXT_disconnect}, which comes primarily from OpenAL Soft.
+		 */
+		EXT_DISCONNECT("ALC_EXT_disconnect"),
+
+		/**
+		 * Refers to {@code ALC_ENUMERATION_EXT}, a standard extension to OpenAL that
+		 * should be included with drivers for PC platforms.
+		 */
+		ENUMERATION_EXT("ALC_ENUMERATION_EXT"),
+
+		/**
+		 * 
+		 */
+		ENUMERATE_ALL_EXT("ALC_ENUMERATE_ALL_EXT");
+
+		// region Instance stuff!
+		private final String NAME;
+
+		private NerdAlExtensionsInfo(final String p_extName) {
+			this.NAME = p_extName;
+		}
+
+		public String getExtensionName() {
+			return this.NAME;
+		}
+		// endregion
+
+	}
+
+	public class NerdAlDefaultObjects {
+
+		// region Fields.
+		public AlNullAuxiliaryEffectSlot auxiliaryEffectSlot;
+		public AlNullBuffer buffer;
+		public AlNullContext context;
+		public AlNullDevice device;
+		public AlNullEffect effect;
+		public AlNullFilter filter;
+		public AlNullSource source;
+		// endregion
+
+		protected NerdAlDefaultObjects() {
+			// this.init();
+		}
+
+		protected void init() {
+			// The constructors of these remove these objects from their respective class's
+			// static lists, and we do the rest down there in the loop!:
+			this.auxiliaryEffectSlot = new AlNullAuxiliaryEffectSlot(NerdAl.this);
+			this.buffer = new AlNullBuffer(NerdAl.this);
+			this.context = new AlNullContext(NerdAl.this);
+			this.device = new AlNullDevice(NerdAl.this);
+			this.effect = new AlNullEffect(NerdAl.this);
+			this.filter = new AlNullFilter(NerdAl.this);
+			this.source = new AlNullSource(NerdAl.this);
+
+			// Remove these default objects from these!:
+			for (final AlNativeResource<?> r : NerdAl.this.RESOURCES) {
+				NerdAl.this.RESOURCES.remove(r);
+				AlNativeResource.ALL_INSTANCES.remove(r);
+			}
+		}
+
+	}
 
 	// region Fields.
+	public final NerdAl.NerdAlDefaultObjects DEFAULTS = new NerdAl.NerdAlDefaultObjects();
 	protected final Vector<AlNativeResource<?>> RESOURCES = new Vector<>(2), RESOURCES_TO_REMOVE = new Vector<>(2);
 
-	protected long contextId;
 	protected AlDevice device;
 	protected AlContext context;
 	protected ALCapabilities alCap;
@@ -65,9 +155,9 @@ public class NerdAl {
 	 * {@link AlDevice#getPhysicalDevicesNames()} to get a list of physical devices
 	 * to connect to.
 	 */
-	public NerdAl(final String p_deviceName) {
-		this.context = this.createAl(p_deviceName);
-		this.contextId = this.context.getId();
+	public NerdAl(final String p_physicalDeviceName) {
+		this.context = this.createAl(p_physicalDeviceName);
+		this.DEFAULTS.init();
 	}
 
 	/**
@@ -76,8 +166,8 @@ public class NerdAl {
 	 *                 creating an {@link AlContext} object.
 	 */
 	public NerdAl(final AlDevice p_device) {
-		this.context = this.createAl(p_device, new AlContext.AlContextSettings());
-		this.contextId = this.context.getId();
+		this.context = this.createAl(p_device, new AlContextSettings());
+		this.DEFAULTS.init();
 	}
 
 	/**
@@ -88,6 +178,7 @@ public class NerdAl {
 	 */
 	public NerdAl(final AlContext p_context) {
 		this.createAl(p_context);
+		this.DEFAULTS.init();
 	}
 
 	/**
@@ -96,9 +187,9 @@ public class NerdAl {
 	 *
 	 * @param p_settings specifies initialization settings.
 	 */
-	public NerdAl(final AlContext.AlContextSettings p_settings) {
+	public NerdAl(final AlContextSettings p_settings) {
 		this.context = this.createAl(AlDevice.getDefaultPhysicalDeviceName(), p_settings);
-		this.contextId = this.context.getId();
+		this.DEFAULTS.init();
 	}
 
 	/**
@@ -110,9 +201,9 @@ public class NerdAl {
 	 * @param p_settings specifies initialization settings for the
 	 *                   {@link AlContext} to create.
 	 */
-	public NerdAl(final AlDevice p_device, final AlContext.AlContextSettings p_settings) {
+	public NerdAl(final AlDevice p_device, final AlContextSettings p_settings) {
 		this.context = this.createAl(p_device, p_settings);
-		this.contextId = this.context.getId();
+		this.DEFAULTS.init();
 	}
 
 	/**
@@ -121,14 +212,15 @@ public class NerdAl {
 	 * {@link AlDevice}, which outputs to the physical device whose name is
 	 * provided.
 	 *
-	 * @param p_deviceName is the name of the physical device the automatically
-	 *                     created {@link AlDevice} will output to.
-	 * @param p_settings   specifies initialization settings for the
-	 *                     {@link AlContext} to create.
+	 * @param p_physicalDeviceName is the name of the physical device the
+	 *                             automatically
+	 *                             created {@link AlDevice} will output to.
+	 * @param p_settings           specifies initialization settings for the
+	 *                             {@link AlContext} to create.
 	 */
-	public NerdAl(final String p_deviceName, final AlContext.AlContextSettings p_settings) {
-		this.context = this.createAl(p_deviceName, p_settings);
-		this.contextId = this.context.getId();
+	public NerdAl(final String p_physicalDeviceName, final AlContextSettings p_settings) {
+		this.context = this.createAl(p_physicalDeviceName, p_settings);
+		this.DEFAULTS.init();
 	}
 
 	// region Initialization.
@@ -140,7 +232,7 @@ public class NerdAl {
 	 * @return The {@link AlContext} this {@link NerdAl} instance will wrap.
 	 */
 	protected AlContext createAl(final String p_deviceName) {
-		return this.createAl(p_deviceName, null);
+		return this.createAl(p_deviceName, null); // `AlContext` constructor deals with the `null`.
 	}
 
 	/**
@@ -149,7 +241,7 @@ public class NerdAl {
 	 *                          object to wrap.
 	 * @return The {@link AlContext} this {@link NerdAl} instance will wrap.
 	 */
-	protected AlContext createAl(final String p_deviceName, final AlContext.AlContextSettings p_contextSettings) {
+	protected AlContext createAl(final String p_deviceName, final AlContextSettings p_contextSettings) {
 		return this.createAl(new AlDevice(this, p_deviceName), p_contextSettings);
 	}
 
@@ -161,7 +253,7 @@ public class NerdAl {
 	 *                          object to wrap.
 	 * @return The {@link AlContext} this {@link NerdAl} instance will wrap.
 	 */
-	protected AlContext createAl(final AlDevice p_device, final AlContext.AlContextSettings p_contextSettings) {
+	protected AlContext createAl(final AlDevice p_device, final AlContextSettings p_contextSettings) {
 		this.device = p_device;
 		return this.createAl(new AlContext(this, p_contextSettings));
 	}
@@ -204,7 +296,6 @@ public class NerdAl {
 		this.checkAlError();
 		this.checkAlcError();
 
-		this.contextId = this.context.getId();
 		return this.context;
 	}
 	// endregion
@@ -278,7 +369,7 @@ public class NerdAl {
 	}
 
 	public long getContextId() {
-		return this.contextId;
+		return this.context.getId();
 	}
 
 	public ALCapabilities getLwjglAlCapabilities() {
@@ -306,23 +397,28 @@ public class NerdAl {
 	// endregion
 
 	// region Error, and other checks.
-	public static boolean isSource(final int p_id) {
+	public boolean isSource(final int p_id) {
+		this.makeContextCurrent();
 		return AL10.alIsSource(p_id);
 	}
 
-	public static boolean isBuffer(final int p_id) {
+	public boolean isBuffer(final int p_id) {
+		this.makeContextCurrent();
 		return AL10.alIsBuffer(p_id);
 	}
 
-	public static boolean isEffect(final int p_id) {
+	public boolean isEffect(final int p_id) {
+		this.makeContextCurrent();
 		return EXTEfx.alIsEffect(p_id);
 	}
 
-	public static boolean isFilter(final int p_id) {
+	public boolean isFilter(final int p_id) {
+		this.makeContextCurrent();
 		return EXTEfx.alIsFilter(p_id);
 	}
 
-	public static boolean isEffectSlot(final int p_id) {
+	public boolean isEffectSlot(final int p_id) {
+		this.makeContextCurrent();
 		return EXTEfx.alIsAuxiliaryEffectSlot(p_id);
 	}
 
@@ -330,7 +426,7 @@ public class NerdAl {
 		return AL10.alGetEnumValue(p_errorString.split("\"")[1]);
 	}
 
-	public static int errorStringToCode(final NerdAbstractOpenAlException p_exception) {
+	public static int errorStringToCode(final AbstractAlException p_exception) {
 		return AL10.alGetEnumValue(p_exception.getAlcErrorString());
 	}
 
@@ -394,11 +490,12 @@ public class NerdAl {
 
 	// region State management.
 	protected void makeContextCurrent() {
-		if (!ALC10.alcMakeContextCurrent(this.contextId))
-			throw new NerdAlException("Could not change the OpenAL context! This should not happen...");
+		if (!ALC10.alcMakeContextCurrent(this.context.getId()))
+			throw new AlUnflaggedException("Could not change the OpenAL context! This should not happen...");
 	}
 
 	public void framelyCallback() {
+		this.RESOURCES.removeAll(this.RESOURCES_TO_REMOVE);
 		AlSource.ALL_INSTANCES.removeAll(AlSource.INSTANCES_TO_REMOVE);
 
 		for (final AlNativeResource<?> r : this.RESOURCES)

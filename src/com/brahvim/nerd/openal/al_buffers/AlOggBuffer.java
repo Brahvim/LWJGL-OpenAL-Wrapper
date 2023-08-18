@@ -11,12 +11,12 @@ import org.lwjgl.stb.STBVorbis;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.libc.LibCStdlib;
 
-import com.brahvim.nerd.openal.AlBuffer;
-import com.brahvim.nerd.openal.NerdAl;
+import com.brahvim.nerd.openal.objects.AlBuffer;
+import com.brahvim.nerd.openal.objects.NerdAl;
 
 public class AlOggBuffer extends AlBuffer<ShortBuffer> {
 
-	protected static final Vector<AlOggBuffer> ALL_INSTANCES = new Vector<>();
+	protected static final Vector<AlOggBuffer> ALL_INSTANCES = new Vector<>(0);
 
 	// region Constructors.
 	public AlOggBuffer(final NerdAl p_alMan) {
@@ -54,10 +54,9 @@ public class AlOggBuffer extends AlBuffer<ShortBuffer> {
 			throw new IllegalArgumentException("This `AlBuffer` was deallocated. Please use a new one!");
 
 		// If we have any data, we free it:
-		if (super.data != null) {
-			LibCStdlib.free(super.data); // Yep, we literally made Java, C. "Welcome to javac!" :joy:
-			super.data = null;
-		}
+		if (super.data != null)
+			LibCStdlib.free(super.data); // Yep, we literally made Java, C. "Welcome to `javac`!" :joy:
+		// The buffer is left unmodified.
 
 		// A note about the use of `org.lwjgl.system.MemoryStack`:
 		/*
@@ -66,7 +65,7 @@ public class AlOggBuffer extends AlBuffer<ShortBuffer> {
 		 * stack can handle into buffers, which is why we use them here. Java would
 		 * otherwise use the heap for any object, including these `java.nio.Buffer`
 		 * subclass instances used here, which is slower for a case like this.
-		 * 
+		 *
 		 * After all, the reason why we're using buffers is just that we're supposed to
 		 * use pointers with C API calls to simulate multiple return values. Why not
 		 * also make them faster to access?
@@ -80,7 +79,6 @@ public class AlOggBuffer extends AlBuffer<ShortBuffer> {
 			final IntBuffer sampleRateBuffer = MemoryStack.stackMallocInt(1);
 
 			// The bigger data (the audio) we're loading. Definitely goes on the heap!
-
 			final ShortBuffer rawAudioBuffer = STBVorbis.stb_vorbis_decode_filename(
 					p_file.getCanonicalPath(), channelsBuffer, sampleRateBuffer);
 

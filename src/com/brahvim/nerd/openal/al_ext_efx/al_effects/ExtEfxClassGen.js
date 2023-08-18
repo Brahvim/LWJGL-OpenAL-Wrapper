@@ -34,6 +34,7 @@ output += "// endregion";
 
 console.log(output);
 
+// #region Functional modules.
 function writeGetter(p_prop, p_type = "float") {
 	let fxnName = "get" + upperSnakeToPascalCase(
 		p_prop.substring(
@@ -93,4 +94,5 @@ function upperSnakeToCamelCase(p_str) {
 function capitalizeFirstChar(p_str) {
 	return p_str.charAt(0).toUpperCase() + p_str.substring(1);
 }
+// #endregion
 // #endregion

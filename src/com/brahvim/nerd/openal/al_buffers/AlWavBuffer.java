@@ -14,8 +14,8 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 
 import org.lwjgl.openal.AL10;
 
-import com.brahvim.nerd.openal.AlBuffer;
-import com.brahvim.nerd.openal.NerdAl;
+import com.brahvim.nerd.openal.objects.AlBuffer;
+import com.brahvim.nerd.openal.objects.NerdAl;
 
 /**
  * @deprecated since the Java APIs don't function in our favor here - to make
@@ -71,7 +71,7 @@ public class AlWavBuffer extends AlBuffer<IntBuffer> {
 		}
 
 		if (format == null)
-			return null;
+			return this;
 
 		// Give the OpenAL buffer the data:
 		AL10.alBufferData(super.id,
