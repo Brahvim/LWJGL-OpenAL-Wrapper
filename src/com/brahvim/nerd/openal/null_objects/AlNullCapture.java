@@ -22,7 +22,6 @@ public class AlNullCapture extends AlCapture implements AlNullObject {
     // public Thread getCaptureThread() {
     // return Thread.currentThread(); // Superclass returns `null` here.
     // }
-
     @Override
     public ByteBuffer getCapturedData() {
         return ByteBuffer.allocate(0);
@@ -82,10 +81,8 @@ public class AlNullCapture extends AlCapture implements AlNullObject {
     // public NerdAl getAlMan() {
     // return super.getAlMan();
     // }
-
     // @Override
     // public Long getId() {
     // return super.getId();
     // }
-
 }

@@ -72,7 +72,7 @@ function upperSnakeToCamelCase(p_str) {
 	const strLen = p_str.length;
 	let lastUn = 0, secLastUn = 0;
 
-	for (let i = 0; i != strLen; i++) {
+	for (let i = 0; i < strLen; i++) {
 		if (p_str.charAt(i) != '_')
 			continue;
 

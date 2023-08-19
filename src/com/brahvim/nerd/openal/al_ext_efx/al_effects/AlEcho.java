@@ -7,62 +7,62 @@ import com.brahvim.nerd.openal.objects.NerdAl;
 
 public class AlEcho extends AlEffect {
 
-	public AlEcho(final NerdAl p_NerdAl) {
-		super(p_NerdAl);
-	}
+    public AlEcho(final NerdAl p_NerdAl) {
+        super(p_NerdAl);
+    }
 
-	@Override
-	protected int getEffectType() {
-		return EXTEfx.AL_EFFECT_ECHO;
-	}
+    @Override
+    protected int getEffectType() {
+        return EXTEfx.AL_EFFECT_ECHO;
+    }
 
-	// region Getters.
-	public float getEchoDelay() {
-		return super.getFloat(EXTEfx.AL_ECHO_DELAY);
-	}
+    // region Getters.
+    public float getEchoDelay() {
+        return super.getFloat(EXTEfx.AL_ECHO_DELAY);
+    }
 
-	public float getEchoLrDelay() {
-		return super.getFloat(EXTEfx.AL_ECHO_LRDELAY);
-	}
+    public float getEchoLrDelay() {
+        return super.getFloat(EXTEfx.AL_ECHO_LRDELAY);
+    }
 
-	public float getEchoDamping() {
-		return super.getFloat(EXTEfx.AL_ECHO_DAMPING);
-	}
+    public float getEchoDamping() {
+        return super.getFloat(EXTEfx.AL_ECHO_DAMPING);
+    }
 
-	public float getEchoFeedback() {
-		return super.getFloat(EXTEfx.AL_ECHO_FEEDBACK);
-	}
+    public float getEchoFeedback() {
+        return super.getFloat(EXTEfx.AL_ECHO_FEEDBACK);
+    }
 
-	public float getEchoSpread() {
-		return super.getFloat(EXTEfx.AL_ECHO_SPREAD);
-	}
-	// endregion
+    public float getEchoSpread() {
+        return super.getFloat(EXTEfx.AL_ECHO_SPREAD);
+    }
+    // endregion
 
-	// region Setters.
-	public AlEcho setEchoDelay(final float p_value) {
-		super.setFloat(EXTEfx.AL_ECHO_DELAY, p_value);
-		return this;
-	}
+    // region Setters.
+    public AlEcho setEchoDelay(final float p_value) {
+        super.setFloat(EXTEfx.AL_ECHO_DELAY, p_value);
+        return this;
+    }
 
-	public AlEcho setEchoLrDelay(final float p_value) {
-		super.setFloat(EXTEfx.AL_ECHO_LRDELAY, p_value);
-		return this;
-	}
+    public AlEcho setEchoLrDelay(final float p_value) {
+        super.setFloat(EXTEfx.AL_ECHO_LRDELAY, p_value);
+        return this;
+    }
 
-	public AlEcho setEchoDamping(final float p_value) {
-		super.setFloat(EXTEfx.AL_ECHO_DAMPING, p_value);
-		return this;
-	}
+    public AlEcho setEchoDamping(final float p_value) {
+        super.setFloat(EXTEfx.AL_ECHO_DAMPING, p_value);
+        return this;
+    }
 
-	public AlEcho setEchoFeedback(final float p_value) {
-		super.setFloat(EXTEfx.AL_ECHO_FEEDBACK, p_value);
-		return this;
-	}
+    public AlEcho setEchoFeedback(final float p_value) {
+        super.setFloat(EXTEfx.AL_ECHO_FEEDBACK, p_value);
+        return this;
+    }
 
-	public AlEcho setEchoSpread(final float p_value) {
-		super.setFloat(EXTEfx.AL_ECHO_SPREAD, p_value);
-		return this;
-	}
-	// endregion
+    public AlEcho setEchoSpread(final float p_value) {
+        super.setFloat(EXTEfx.AL_ECHO_SPREAD, p_value);
+        return this;
+    }
+    // endregion
 
 }

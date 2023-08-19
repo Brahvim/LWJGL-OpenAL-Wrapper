@@ -7,35 +7,35 @@ import com.brahvim.nerd.openal.objects.NerdAl;
 
 public class AlPitchShifter extends AlEffect {
 
-	public AlPitchShifter(final NerdAl p_NerdAl) {
-		super(p_NerdAl);
-	}
+    public AlPitchShifter(final NerdAl p_NerdAl) {
+        super(p_NerdAl);
+    }
 
-	@Override
-	protected int getEffectType() {
-		return EXTEfx.AL_EFFECT_PITCH_SHIFTER;
-	}
+    @Override
+    protected int getEffectType() {
+        return EXTEfx.AL_EFFECT_PITCH_SHIFTER;
+    }
 
-	// region Getters.
-	public int getPitchShifterFineTune() {
-		return super.getInt(EXTEfx.AL_PITCH_SHIFTER_FINE_TUNE);
-	}
+    // region Getters.
+    public int getPitchShifterFineTune() {
+        return super.getInt(EXTEfx.AL_PITCH_SHIFTER_FINE_TUNE);
+    }
 
-	public int getPitchShifterCoarseTune() {
-		return super.getInt(EXTEfx.AL_PITCH_SHIFTER_COARSE_TUNE);
-	}
-	// endregion
+    public int getPitchShifterCoarseTune() {
+        return super.getInt(EXTEfx.AL_PITCH_SHIFTER_COARSE_TUNE);
+    }
+    // endregion
 
-	// region Setters.
-	public AlPitchShifter setPitchShifterFineTune(final int p_value) {
-		super.setInt(EXTEfx.AL_PITCH_SHIFTER_FINE_TUNE, p_value);
-		return this;
-	}
+    // region Setters.
+    public AlPitchShifter setPitchShifterFineTune(final int p_value) {
+        super.setInt(EXTEfx.AL_PITCH_SHIFTER_FINE_TUNE, p_value);
+        return this;
+    }
 
-	public AlPitchShifter setPitchShifterCoarseTune(final int p_value) {
-		super.setInt(EXTEfx.AL_PITCH_SHIFTER_COARSE_TUNE, p_value);
-		return this;
-	}
-	// endregion
+    public AlPitchShifter setPitchShifterCoarseTune(final int p_value) {
+        super.setInt(EXTEfx.AL_PITCH_SHIFTER_COARSE_TUNE, p_value);
+        return this;
+    }
+    // endregion
 
 }

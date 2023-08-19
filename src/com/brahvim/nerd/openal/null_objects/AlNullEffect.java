@@ -8,68 +8,68 @@ import com.brahvim.nerd.openal.objects.NerdAl;
 
 public class AlNullEffect extends AlEffect implements AlNullObject {
 
-	public AlNullEffect(final NerdAl p_alMan) {
-		super(p_alMan, 0);
-		AlEffect.ALL_INSTANCES.remove(this);
-	}
+    public AlNullEffect(final NerdAl p_alMan) {
+        super(p_alMan, 0);
+        AlEffect.ALL_INSTANCES.remove(this);
+    }
 
-	@Override
-	protected void disposeImpl() {
-	}
+    @Override
+    protected void disposeImpl() {
+    }
 
-	@Override
-	protected int getEffectType() {
-		return EXTEfx.AL_EFFECT_NULL;
-	}
+    @Override
+    protected int getEffectType() {
+        return EXTEfx.AL_EFFECT_NULL;
+    }
 
-	@Override
-	public float getFloat(final int p_alEnum) {
-		return 0;
-	}
+    @Override
+    public float getFloat(final int p_alEnum) {
+        return 0;
+    }
 
-	@Override
-	public float[] getFloatVector(final int p_alEnum, final int p_vecSize) {
-		return new float[p_vecSize];
-	}
+    @Override
+    public float[] getFloatVector(final int p_alEnum, final int p_vecSize) {
+        return new float[p_vecSize];
+    }
 
-	@Override
-	public int getInt(final int p_alEnum) {
-		return 0;
-	}
+    @Override
+    public int getInt(final int p_alEnum) {
+        return 0;
+    }
 
-	@Override
-	public int[] getIntVector(final int p_alEnum, final int p_vecSize) {
-		return new int[p_vecSize];
-	}
+    @Override
+    public int[] getIntVector(final int p_alEnum, final int p_vecSize) {
+        return new int[p_vecSize];
+    }
 
-	@Override
-	public AlAuxiliaryEffectSlot getSlot() {
-		return super.MAN.DEFAULTS.auxiliaryEffectSlot;
-	}
+    @Override
+    public AlAuxiliaryEffectSlot getSlot() {
+        return super.MAN.DEFAULTS.auxiliaryEffectSlot;
+    }
 
-	@Override
-	public boolean isUsed() {
-		return false;
-	}
+    @Override
+    public boolean isUsed() {
+        return false;
+    }
 
-	@Override
-	public void setFloat(final int p_alEnum, final float p_value) {
-	}
+    @Override
+    public void setFloat(final int p_alEnum, final float p_value) {
+    }
 
-	@Override
-	public void setFloatVector(final int p_alEnum, final float... p_values) {
-	}
+    @Override
+    public void setFloatVector(final int p_alEnum, final float... p_values) {
+    }
 
-	@Override
-	public void setInt(final int p_alEnum, final int p_value) {
-	}
+    @Override
+    public void setInt(final int p_alEnum, final int p_value) {
+    }
 
-	@Override
-	public void setIntVector(final int p_alEnum, final int... p_values) {
-	}
+    @Override
+    public void setIntVector(final int p_alEnum, final int... p_values) {
+    }
 
-	@Override
-	protected void framelyCallback() {
-	}
+    @Override
+    protected void framelyCallback() {
+    }
 
 }

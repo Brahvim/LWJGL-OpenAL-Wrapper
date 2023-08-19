@@ -7,8 +7,8 @@ import org.lwjgl.openal.AL10;
  */
 public class AlException extends AbstractAlException {
 
-	public AlException(final int p_alErrorCode) {
-		super(AL10.alGetString(p_alErrorCode), p_alErrorCode);
-	}
+    public AlException(final int p_alErrorCode) {
+        super(AL10.alGetString(p_alErrorCode), p_alErrorCode);
+    }
 
 }

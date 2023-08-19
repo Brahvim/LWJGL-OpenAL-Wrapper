@@ -7,35 +7,35 @@ import com.brahvim.nerd.openal.objects.NerdAl;
 
 public class AlHighpassFilter extends AlFilter {
 
-	public AlHighpassFilter(final NerdAl p_alMan) {
-		super(p_alMan);
-	}
+    public AlHighpassFilter(final NerdAl p_alMan) {
+        super(p_alMan);
+    }
 
-	@Override
-	public int getName() {
-		return EXTEfx.AL_FILTER_HIGHPASS;
-	}
+    @Override
+    public int getName() {
+        return EXTEfx.AL_FILTER_HIGHPASS;
+    }
 
-	// region Getters.
-	public float getHighpassGain() {
-		return super.getFloat(EXTEfx.AL_HIGHPASS_GAIN);
-	}
+    // region Getters.
+    public float getHighpassGain() {
+        return super.getFloat(EXTEfx.AL_HIGHPASS_GAIN);
+    }
 
-	public float getHighpassGainLf() {
-		return super.getFloat(EXTEfx.AL_HIGHPASS_GAINLF);
-	}
-	// endregion
+    public float getHighpassGainLf() {
+        return super.getFloat(EXTEfx.AL_HIGHPASS_GAINLF);
+    }
+    // endregion
 
-	// region Setters.
-	public AlHighpassFilter setHighpassGain(final float p_value) {
-		super.setFloat(EXTEfx.AL_HIGHPASS_GAIN, p_value);
-		return this;
-	}
+    // region Setters.
+    public AlHighpassFilter setHighpassGain(final float p_value) {
+        super.setFloat(EXTEfx.AL_HIGHPASS_GAIN, p_value);
+        return this;
+    }
 
-	public AlHighpassFilter setHighpassGainLf(final float p_value) {
-		super.setFloat(EXTEfx.AL_HIGHPASS_GAINLF, p_value);
-		return this;
-	}
-	// endregion
+    public AlHighpassFilter setHighpassGainLf(final float p_value) {
+        super.setFloat(EXTEfx.AL_HIGHPASS_GAINLF, p_value);
+        return this;
+    }
+    // endregion
 
 }

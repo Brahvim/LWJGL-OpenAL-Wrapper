@@ -11,158 +11,167 @@ import org.lwjgl.system.MemoryStack;
 
 public abstract class AlEffect extends AlNativeResource<Integer> {
 
-	// region Fields.
-	protected static final Vector<AlEffect> ALL_INSTANCES = new Vector<>(0);
+    // region Fields.
+    protected static final Vector<AlEffect> ALL_INSTANCES = new Vector<>(0);
 
-	protected AlAuxiliaryEffectSlot slot;
-	// endregion
+    protected AlAuxiliaryEffectSlot slot;
+    // endregion
 
-	protected AlEffect(final NerdAl p_alMan) {
-		super(p_alMan);
-		this.slot = super.MAN.DEFAULTS.auxiliaryEffectSlot;
+    protected AlEffect(final NerdAl p_alMan) {
+        super(p_alMan);
+        this.slot = super.MAN.DEFAULTS.auxiliaryEffectSlot;
 
-		super.id = EXTEfx.alGenEffects();
-		this.setInt(EXTEfx.AL_EFFECT_TYPE, this.getEffectType());
-		super.MAN.checkAlError();
-		AlEffect.ALL_INSTANCES.add(this);
-	}
+        super.id = EXTEfx.alGenEffects();
+        this.setInt(EXTEfx.AL_EFFECT_TYPE, this.getEffectType());
+        super.MAN.checkAlError();
+        AlEffect.ALL_INSTANCES.add(this);
+    }
 
-	// I really wish these objects could have constructors that took in IDs of
-	// objects which did not have a `NerdAl` wrapper available, then literally
-	// create the entire 'wrapper empire' this library lets you build, and let you
-	// borrow those objects back with all the getters you get - <sigh>.
-	protected AlEffect(final NerdAl p_alMan, final int p_id) {
-		super(p_alMan);
-		AlEffect.ALL_INSTANCES.add(this);
-		this.slot = super.MAN.DEFAULTS.auxiliaryEffectSlot;
+    // I really wish these objects could have constructors that took in IDs of
+    // objects which did not have a `NerdAl` wrapper available, then literally
+    // create the entire 'wrapper empire' this library lets you build, and let you
+    // borrow those objects back with all the getters you get - <sigh>.
+    protected AlEffect(final NerdAl p_alMan, final int p_id) {
+        super(p_alMan);
+        AlEffect.ALL_INSTANCES.add(this);
+        this.slot = super.MAN.DEFAULTS.auxiliaryEffectSlot;
 
-		if (super.MAN.isEffect(p_id))
-			super.id = EXTEfx.alGenEffects();
+        if (super.MAN.isEffect(p_id)) {
+            super.id = EXTEfx.alGenEffects();
+        }
 
-		this.setInt(EXTEfx.AL_EFFECT_TYPE, this.getEffectType());
-		super.MAN.checkAlError();
-	}
+        this.setInt(EXTEfx.AL_EFFECT_TYPE, this.getEffectType());
+        super.MAN.checkAlError();
+    }
 
-	// region Instance collection queries.
-	public static int getNumInstances() {
-		return AlEffect.ALL_INSTANCES.size();
-	}
+    // region Instance collection queries.
+    public static int getNumInstances() {
+        return AlEffect.ALL_INSTANCES.size();
+    }
 
-	public static List<AlEffect> getAllInstances() {
-		return new ArrayList<>(AlEffect.ALL_INSTANCES);
-	}
-	// endregion
+    public static List<AlEffect> getAllInstances() {
+        return new ArrayList<>(AlEffect.ALL_INSTANCES);
+    }
+    // endregion
 
-	// region Getters!
-	protected abstract int getEffectType();
+    // region Getters!
+    protected abstract int getEffectType();
 
-	public boolean isUsed() {
-		return this.slot != null;
-	}
-	// endregion
+    public boolean isUsed() {
+        return this.slot != null;
+    }
+    // endregion
 
-	// region C-style OpenAL getters.
-	public int getInt(final int p_alEnum) {
-		MemoryStack.stackPush();
-		final IntBuffer buffer = MemoryStack.stackMallocInt(1);
+    // region C-style OpenAL getters.
+    public int getInt(final int p_alEnum) {
+        MemoryStack.stackPush();
+        final IntBuffer buffer = MemoryStack.stackMallocInt(1);
 
-		if (super.hasDisposed)
-			return Integer.MIN_VALUE;
+        if (super.hasDisposed) {
+            return Integer.MIN_VALUE;
+        }
 
-		EXTEfx.alGetEffecti(super.id, p_alEnum, buffer);
+        EXTEfx.alGetEffecti(super.id, p_alEnum, buffer);
 
-		MemoryStack.stackPop();
-		super.MAN.checkAlError();
+        MemoryStack.stackPop();
+        super.MAN.checkAlError();
 
-		return buffer.get();
-	}
+        return buffer.get();
+    }
 
-	public int[] getIntVector(final int p_alEnum, final int p_vecSize) {
-		MemoryStack.stackPush();
-		final IntBuffer buffer = MemoryStack.stackMallocInt(p_vecSize);
+    public int[] getIntVector(final int p_alEnum, final int p_vecSize) {
+        MemoryStack.stackPush();
+        final IntBuffer buffer = MemoryStack.stackMallocInt(p_vecSize);
 
-		if (super.hasDisposed)
-			return new int[0];
+        if (super.hasDisposed) {
+            return new int[0];
+        }
 
-		EXTEfx.alGetEffectiv(super.id, p_alEnum, buffer);
+        EXTEfx.alGetEffectiv(super.id, p_alEnum, buffer);
 
-		MemoryStack.stackPop();
-		super.MAN.checkAlError();
+        MemoryStack.stackPop();
+        super.MAN.checkAlError();
 
-		return buffer.array();
-	}
+        return buffer.array();
+    }
 
-	public float getFloat(final int p_alEnum) {
-		MemoryStack.stackPush();
-		final FloatBuffer buffer = MemoryStack.stackMallocFloat(1);
+    public float getFloat(final int p_alEnum) {
+        MemoryStack.stackPush();
+        final FloatBuffer buffer = MemoryStack.stackMallocFloat(1);
 
-		if (super.hasDisposed)
-			return -Float.MAX_VALUE;
+        if (super.hasDisposed) {
+            return -Float.MAX_VALUE;
+        }
 
-		EXTEfx.alGetEffectf(super.id, p_alEnum, buffer);
+        EXTEfx.alGetEffectf(super.id, p_alEnum, buffer);
 
-		MemoryStack.stackPop();
-		super.MAN.checkAlError();
+        MemoryStack.stackPop();
+        super.MAN.checkAlError();
 
-		return buffer.get();
-	}
+        return buffer.get();
+    }
 
-	public float[] getFloatVector(final int p_alEnum, final int p_vecSize) {
-		MemoryStack.stackPush();
-		final FloatBuffer buffer = MemoryStack.stackMallocFloat(p_vecSize);
+    public float[] getFloatVector(final int p_alEnum, final int p_vecSize) {
+        MemoryStack.stackPush();
+        final FloatBuffer buffer = MemoryStack.stackMallocFloat(p_vecSize);
 
-		if (super.hasDisposed)
-			return new float[0];
+        if (super.hasDisposed) {
+            return new float[0];
+        }
 
-		EXTEfx.alGetEffectfv(super.id, p_alEnum, buffer);
+        EXTEfx.alGetEffectfv(super.id, p_alEnum, buffer);
 
-		MemoryStack.stackPop();
-		super.MAN.checkAlError();
+        MemoryStack.stackPop();
+        super.MAN.checkAlError();
 
-		return buffer.array();
-	}
-	// endregion
+        return buffer.array();
+    }
+    // endregion
 
-	// region C-style OpenAL setters.
-	public void setInt(final int p_alEnum, final int p_value) {
-		EXTEfx.alEffecti(super.id, p_alEnum, p_value);
-		super.MAN.checkAlError();
+    // region C-style OpenAL setters.
+    public void setInt(final int p_alEnum, final int p_value) {
+        EXTEfx.alEffecti(super.id, p_alEnum, p_value);
+        super.MAN.checkAlError();
 
-		if (this.slot != null)
-			this.slot.setEffect(this);
-	}
+        if (this.slot != null) {
+            this.slot.setEffect(this);
+        }
+    }
 
-	public void setIntVector(final int p_alEnum, final int... p_values) {
-		EXTEfx.alEffectiv(super.id, p_alEnum, p_values);
-		if (this.slot != null)
-			this.slot.setEffect(this);
-		super.MAN.checkAlError();
-	}
+    public void setIntVector(final int p_alEnum, final int... p_values) {
+        EXTEfx.alEffectiv(super.id, p_alEnum, p_values);
+        if (this.slot != null) {
+            this.slot.setEffect(this);
+        }
+        super.MAN.checkAlError();
+    }
 
-	public void setFloat(final int p_alEnum, final float p_value) {
-		EXTEfx.alEffectf(super.id, p_alEnum, p_value);
-		if (this.slot != null)
-			this.slot.setEffect(this);
-		super.MAN.checkAlError();
-	}
+    public void setFloat(final int p_alEnum, final float p_value) {
+        EXTEfx.alEffectf(super.id, p_alEnum, p_value);
+        if (this.slot != null) {
+            this.slot.setEffect(this);
+        }
+        super.MAN.checkAlError();
+    }
 
-	public void setFloatVector(final int p_alEnum, final float... p_values) {
-		EXTEfx.alEffectfv(super.id, p_alEnum, p_values);
-		if (this.slot != null)
-			this.slot.setEffect(this);
-		super.MAN.checkAlError();
-	}
-	// endregion
+    public void setFloatVector(final int p_alEnum, final float... p_values) {
+        EXTEfx.alEffectfv(super.id, p_alEnum, p_values);
+        if (this.slot != null) {
+            this.slot.setEffect(this);
+        }
+        super.MAN.checkAlError();
+    }
+    // endregion
 
-	public AlAuxiliaryEffectSlot getSlot() {
-		return this.slot;
-	}
+    public AlAuxiliaryEffectSlot getSlot() {
+        return this.slot;
+    }
 
-	@Override
-	protected void disposeImpl() {
-		this.slot.setEffect(null);
-		EXTEfx.alDeleteEffects(super.id);
-		AlEffect.ALL_INSTANCES.remove(this);
-	}
+    @Override
+    protected void disposeImpl() {
+        this.slot.setEffect(null);
+        EXTEfx.alDeleteEffects(super.id);
+        AlEffect.ALL_INSTANCES.remove(this);
+    }
 
 }

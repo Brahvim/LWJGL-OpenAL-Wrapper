@@ -20,68 +20,71 @@ import fr.delthas.javamp3.Mp3InputStream;
 
 public class AlMp3Buffer extends AlBuffer<IntBuffer> {
 
-	protected static final Vector<AlMp3Buffer> ALL_INSTANCES = new Vector<>(0);
+    protected static final Vector<AlMp3Buffer> ALL_INSTANCES = new Vector<>(0);
 
-	// region Constructors.
-	public AlMp3Buffer(final NerdAl p_alMan) {
-		super(p_alMan);
-		AlMp3Buffer.ALL_INSTANCES.add(this);
-	}
+    // region Constructors.
+    public AlMp3Buffer(final NerdAl p_alMan) {
+        super(p_alMan);
+        AlMp3Buffer.ALL_INSTANCES.add(this);
+    }
 
-	public AlMp3Buffer(final AlBuffer<?> p_buffer) {
-		super(p_buffer);
-		AlMp3Buffer.ALL_INSTANCES.add(this);
-	}
+    public AlMp3Buffer(final AlBuffer<?> p_buffer) {
+        super(p_buffer);
+        AlMp3Buffer.ALL_INSTANCES.add(this);
+    }
 
-	public AlMp3Buffer(final NerdAl p_alMan, final int p_id) {
-		super(p_alMan, p_id);
-		AlMp3Buffer.ALL_INSTANCES.add(this);
-	}
-	// endregion
+    public AlMp3Buffer(final NerdAl p_alMan, final int p_id) {
+        super(p_alMan, p_id);
+        AlMp3Buffer.ALL_INSTANCES.add(this);
+    }
+    // endregion
 
-	@Override
-	protected void disposeImpl() {
-		super.disposeImpl();
-		AlMp3Buffer.ALL_INSTANCES.remove(this);
-	}
+    @Override
+    protected void disposeImpl() {
+        super.disposeImpl();
+        AlMp3Buffer.ALL_INSTANCES.remove(this);
+    }
 
-	@Override
-	protected void setDataImpl(final int p_format, final IntBuffer p_buffer, final int p_sampleRate) {
-		AL10.alBufferData(super.id, p_format, p_buffer, p_sampleRate);
-	}
+    @Override
+    protected void setDataImpl(final int p_format, final IntBuffer p_buffer, final int p_sampleRate) {
+        AL10.alBufferData(super.id, p_format, p_buffer, p_sampleRate);
+    }
 
-	@Override
-	public AlBuffer<?> loadFrom(final String p_path) {
-		return super.loadFrom(p_path);
-	}
+    // @Override
+    // @Deprecated
+    // public AlBuffer<?> loadFrom(final String p_path) {
+    // return super.loadFrom(p_path);
+    // }
 
-	@Override
-	// @Deprecated
-	protected AlMp3Buffer loadFromImpl(final File p_file) {
-		AudioFormat format = null;
-		final ByteArrayOutputStream bytes = new ByteArrayOutputStream(
-				(int) Math.min(Integer.MAX_VALUE, p_file.length()));
+    @Override
+    // @Deprecated
+    protected AlMp3Buffer loadFromImpl(final File p_file) {
+        AudioFormat format = null;
+        final ByteArrayOutputStream bytes = new ByteArrayOutputStream(
+                (int) Math.min(Integer.MAX_VALUE, p_file.length()));
 
-		try (final Mp3InputStream stream = new Mp3InputStream(new FileInputStream(p_file))) {
-			format = stream.getAudioFormat();
-			for (int b = 0; (b = stream.read()) != -1;)
-				bytes.write(b);
-		} catch (final IOException e) {
-			e.printStackTrace();
-		}
+        try (final Mp3InputStream stream = new Mp3InputStream(new FileInputStream(p_file))) {
+            format = stream.getAudioFormat();
+            for (int b = 0; (b = stream.read()) != -1;) {
+                bytes.write(b);
+            }
+        } catch (final IOException e) {
+            e.printStackTrace();
+        }
 
-		if (format == null)
-			return this;
+        if (format == null) {
+            return this;
+        }
 
-		AL10.alBufferData(super.id,
-				super.alFormat = format.getChannels() == 1
-						? AL10.AL_FORMAT_MONO16
-						: AL10.AL_FORMAT_STEREO16,
-				ByteBuffer.wrap(bytes.toByteArray())
-						.order(ByteOrder.nativeOrder()).asIntBuffer(),
-				(int) format.getSampleRate());
+        AL10.alBufferData(super.id,
+                super.alFormat = format.getChannels() == 1
+                        ? AL10.AL_FORMAT_MONO16
+                        : AL10.AL_FORMAT_STEREO16,
+                ByteBuffer.wrap(bytes.toByteArray())
+                        .order(ByteOrder.nativeOrder()).asIntBuffer(),
+                (int) format.getSampleRate());
 
-		return this;
-	}
+        return this;
+    }
 
 }
