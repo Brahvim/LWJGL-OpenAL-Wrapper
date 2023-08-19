@@ -17,11 +17,6 @@ import org.lwjgl.openal.AL10;
 import com.brahvim.nerd.openal.objects.AlBuffer;
 import com.brahvim.nerd.openal.objects.NerdAl;
 
-/**
- * @deprecated since the Java APIs don't function in our favor here - to make
- *             this work, I'll need a way to convert!
- */
-@Deprecated
 public class AlWavBuffer extends AlBuffer<IntBuffer> {
 
 	// region Constructors.
@@ -50,13 +45,12 @@ public class AlWavBuffer extends AlBuffer<IntBuffer> {
 	}
 
 	@Override
-	@Deprecated
 	public AlBuffer<?> loadFrom(final String p_path) {
 		return super.loadFrom(p_path);
 	}
 
 	@Override
-	@Deprecated
+	// @Deprecated
 	protected AlWavBuffer loadFromImpl(final File p_file) {
 		AudioFormat format = null;
 		final ByteArrayOutputStream bytes = new ByteArrayOutputStream(

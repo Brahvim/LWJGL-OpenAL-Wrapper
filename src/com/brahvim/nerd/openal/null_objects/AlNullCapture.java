@@ -7,7 +7,6 @@ import com.brahvim.nerd.openal.objects.AlBuffer;
 import com.brahvim.nerd.openal.objects.AlCapture;
 import com.brahvim.nerd.openal.objects.NerdAl;
 
-@Deprecated
 public class AlNullCapture extends AlCapture implements AlNullObject {
 
     public AlNullCapture(final NerdAl p_alMan) {

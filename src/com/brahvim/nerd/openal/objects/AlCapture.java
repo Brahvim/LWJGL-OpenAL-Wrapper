@@ -15,11 +15,6 @@ import org.lwjgl.openal.ALC11;
 import com.brahvim.nerd.openal.al_buffers.AlWavBuffer;
 import com.brahvim.nerd.openal.al_exceptions.AlcException;
 
-/**
- * @deprecated I don't yet understand how one records audio with OpenAL. Need to
- *             read, the docs!
- */
-@Deprecated
 public class AlCapture extends AlNativeResource<Long> {
 
 	// region Fields.

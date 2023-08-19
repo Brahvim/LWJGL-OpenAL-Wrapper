@@ -1,13 +1,12 @@
 package com.brahvim.nerd.openal.null_objects;
 
 import com.brahvim.nerd.openal.objects.AlBufferStream;
-import com.brahvim.nerd.openal.objects.AlSource;
 import com.brahvim.nerd.openal.objects.NerdAl;
 
 public class AlNullBufferStream extends AlBufferStream implements AlNullObject {
 
-    public AlNullBufferStream(final NerdAl p_alMan, final AlSource p_source) {
-        super(p_alMan, p_source);
+    public AlNullBufferStream(final NerdAl p_alMan) {
+        super(p_alMan, p_alMan.DEFAULTS.source);
         super.USED_BUFFERS.trimToSize();
         super.UNUSED_BUFFERS.trimToSize();
         AlBufferStream.ALL_INSTANCES.remove(this);

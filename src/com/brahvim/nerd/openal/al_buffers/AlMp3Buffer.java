@@ -18,11 +18,6 @@ import com.brahvim.nerd.openal.objects.NerdAl;
 
 import fr.delthas.javamp3.Mp3InputStream;
 
-/**
- * @deprecated I relied on an old library and doing that failed.
- *             ...Only if I knew how to use it correctly!
- */
-@Deprecated
 public class AlMp3Buffer extends AlBuffer<IntBuffer> {
 
 	protected static final Vector<AlMp3Buffer> ALL_INSTANCES = new Vector<>(0);
@@ -56,13 +51,12 @@ public class AlMp3Buffer extends AlBuffer<IntBuffer> {
 	}
 
 	@Override
-	@Deprecated
 	public AlBuffer<?> loadFrom(final String p_path) {
 		return super.loadFrom(p_path);
 	}
 
 	@Override
-	@Deprecated
+	// @Deprecated
 	protected AlMp3Buffer loadFromImpl(final File p_file) {
 		AudioFormat format = null;
 		final ByteArrayOutputStream bytes = new ByteArrayOutputStream(

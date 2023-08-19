@@ -22,6 +22,8 @@ import com.brahvim.nerd.openal.al_exceptions.AlUnflaggedException;
 import com.brahvim.nerd.openal.al_exceptions.AlcException;
 import com.brahvim.nerd.openal.null_objects.AlNullAuxiliaryEffectSlot;
 import com.brahvim.nerd.openal.null_objects.AlNullBuffer;
+import com.brahvim.nerd.openal.null_objects.AlNullBufferStream;
+import com.brahvim.nerd.openal.null_objects.AlNullCapture;
 import com.brahvim.nerd.openal.null_objects.AlNullContext;
 import com.brahvim.nerd.openal.null_objects.AlNullDevice;
 import com.brahvim.nerd.openal.null_objects.AlNullEffect;
@@ -97,26 +99,29 @@ public class NerdAl {
 		public AlNullAuxiliaryEffectSlot auxiliaryEffectSlot;
 		public AlNullBuffer buffer;
 		public AlNullContext context;
+
+		@SuppressWarnings("deprecation")
+		public AlNullCapture capture;
 		public AlNullDevice device;
 		public AlNullEffect effect;
 		public AlNullFilter filter;
 		public AlNullSource source;
+		public AlNullBufferStream stream;
 		// endregion
 
+		@SuppressWarnings("deprecation")
 		protected NerdAlDefaultObjects() {
-			// this.init();
-		}
-
-		protected void init() {
 			// The constructors of these remove these objects from their respective class's
 			// static lists, and we do the rest down there in the loop!:
 			this.auxiliaryEffectSlot = new AlNullAuxiliaryEffectSlot(NerdAl.this);
 			this.buffer = new AlNullBuffer(NerdAl.this);
 			this.context = new AlNullContext(NerdAl.this);
+			this.capture = new AlNullCapture(NerdAl.this);
 			this.device = new AlNullDevice(NerdAl.this);
 			this.effect = new AlNullEffect(NerdAl.this);
 			this.filter = new AlNullFilter(NerdAl.this);
 			this.source = new AlNullSource(NerdAl.this);
+			this.stream = new AlNullBufferStream(NerdAl.this);
 
 			// Remove these default objects from these!:
 			for (final AlNativeResource<?> r : NerdAl.this.RESOURCES) {
@@ -128,7 +133,7 @@ public class NerdAl {
 	}
 
 	// region Fields.
-	public final NerdAl.NerdAlDefaultObjects DEFAULTS = new NerdAl.NerdAlDefaultObjects();
+	public final NerdAl.NerdAlDefaultObjects DEFAULTS;
 	protected final Vector<AlNativeResource<?>> RESOURCES = new Vector<>(2), RESOURCES_TO_REMOVE = new Vector<>(2);
 
 	protected AlDevice device;
@@ -157,7 +162,7 @@ public class NerdAl {
 	 */
 	public NerdAl(final String p_physicalDeviceName) {
 		this.context = this.createAl(p_physicalDeviceName);
-		this.DEFAULTS.init();
+		this.DEFAULTS = new NerdAl.NerdAlDefaultObjects();
 	}
 
 	/**
@@ -167,7 +172,7 @@ public class NerdAl {
 	 */
 	public NerdAl(final AlDevice p_device) {
 		this.context = this.createAl(p_device, new AlContextSettings());
-		this.DEFAULTS.init();
+		this.DEFAULTS = new NerdAl.NerdAlDefaultObjects();
 	}
 
 	/**
@@ -178,7 +183,7 @@ public class NerdAl {
 	 */
 	public NerdAl(final AlContext p_context) {
 		this.createAl(p_context);
-		this.DEFAULTS.init();
+		this.DEFAULTS = new NerdAl.NerdAlDefaultObjects();
 	}
 
 	/**
@@ -189,7 +194,7 @@ public class NerdAl {
 	 */
 	public NerdAl(final AlContextSettings p_settings) {
 		this.context = this.createAl(AlDevice.getDefaultPhysicalDeviceName(), p_settings);
-		this.DEFAULTS.init();
+		this.DEFAULTS = new NerdAl.NerdAlDefaultObjects();
 	}
 
 	/**
@@ -203,7 +208,7 @@ public class NerdAl {
 	 */
 	public NerdAl(final AlDevice p_device, final AlContextSettings p_settings) {
 		this.context = this.createAl(p_device, p_settings);
-		this.DEFAULTS.init();
+		this.DEFAULTS = new NerdAl.NerdAlDefaultObjects();
 	}
 
 	/**
@@ -220,7 +225,7 @@ public class NerdAl {
 	 */
 	public NerdAl(final String p_physicalDeviceName, final AlContextSettings p_settings) {
 		this.context = this.createAl(p_physicalDeviceName, p_settings);
-		this.DEFAULTS.init();
+		this.DEFAULTS = new NerdAl.NerdAlDefaultObjects();
 	}
 
 	// region Initialization.
