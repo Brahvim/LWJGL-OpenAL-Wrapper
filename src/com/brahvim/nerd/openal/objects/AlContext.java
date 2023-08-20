@@ -6,13 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
-import org.lwjgl.openal.AL;
 import org.lwjgl.openal.AL10;
 import org.lwjgl.openal.AL11;
-import org.lwjgl.openal.ALC;
 import org.lwjgl.openal.ALC10;
-import org.lwjgl.openal.ALCCapabilities;
-import org.lwjgl.openal.ALCapabilities;
 import org.lwjgl.openal.EXTEfx;
 import org.lwjgl.system.MemoryStack;
 
@@ -26,8 +22,8 @@ public class AlContext extends AlNativeResource<Long> {
     // region Fields.
     protected static final Vector<AlContext> ALL_INSTANCES = new Vector<>(1);
 
-    protected final ALCapabilities AL_CAPABILITIES;
-    protected final ALCCapabilities ALC_CAPABILITIES;
+    // protected final ALCapabilities AL_CAPABILITIES;
+    // protected final ALCCapabilities ALC_CAPABILITIES;
     // endregion
 
     // region Constructors.
@@ -49,8 +45,8 @@ public class AlContext extends AlNativeResource<Long> {
             ALC10.alcMakeContextCurrent(currentContextId);
         }
 
-        this.ALC_CAPABILITIES = ALC.createCapabilities(this.getDevice().getId());
-        this.AL_CAPABILITIES = AL.createCapabilities(this.ALC_CAPABILITIES);
+        // this.ALC_CAPABILITIES = ALC.createCapabilities(this.getDevice().getId());
+        // this.AL_CAPABILITIES = AL.createCapabilities(this.ALC_CAPABILITIES);
 
         AlContext.ALL_INSTANCES.add(this);
     }
@@ -59,8 +55,8 @@ public class AlContext extends AlNativeResource<Long> {
         super(p_alMan);
         super.id = this.createNativeContext(p_settings);
 
-        this.ALC_CAPABILITIES = ALC.createCapabilities(this.getDevice().getId());
-        this.AL_CAPABILITIES = AL.createCapabilities(this.ALC_CAPABILITIES);
+        // this.ALC_CAPABILITIES = ALC.createCapabilities(this.getDevice().getId());
+        // this.AL_CAPABILITIES = AL.createCapabilities(this.ALC_CAPABILITIES);
 
         AlContext.ALL_INSTANCES.add(this);
     }
@@ -106,13 +102,13 @@ public class AlContext extends AlNativeResource<Long> {
         return super.MAN.getDevice();
     }
 
-    public ALCapabilities getLwjglAlCapabilities() {
-        return this.AL_CAPABILITIES;
-    }
+    // public ALCapabilities getLwjglAlCapabilities() {
+    // return this.AL_CAPABILITIES;
+    // }
 
-    public ALCCapabilities getLwjglAlcCapabilities() {
-        return this.ALC_CAPABILITIES;
-    }
+    // public ALCCapabilities getLwjglAlcCapabilities() {
+    // return this.ALC_CAPABILITIES;
+    // }
     // endregion
 
     // region OpenAL listener manipulation.

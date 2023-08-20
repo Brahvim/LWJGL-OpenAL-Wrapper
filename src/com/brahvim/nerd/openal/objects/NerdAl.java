@@ -29,6 +29,7 @@ import com.brahvim.nerd.openal.null_objects.AlNullDevice;
 import com.brahvim.nerd.openal.null_objects.AlNullEffect;
 import com.brahvim.nerd.openal.null_objects.AlNullFilter;
 import com.brahvim.nerd.openal.null_objects.AlNullSource;
+import com.brahvim.nerd.openal.null_objects.NullNerdAl;
 
 /**
  * Wrapper to sit on top of an {@link AlContext} to allow access to
@@ -126,7 +127,6 @@ public class NerdAl {
                 AlNativeResource.ALL_INSTANCES.remove(r);
             }
         }
-
     }
 
     // region Fields.
@@ -152,17 +152,6 @@ public class NerdAl {
     }
 
     /**
-     * Creates an abstract, OpenAL "device" object ({@link AlDevice} instance)
-     * given just the name of a physical device to connect to. Use
-     * {@link AlDevice#getPhysicalDevicesNames()} to get a list of physical
-     * devices to connect to.
-     */
-    public NerdAl(final String p_physicalDeviceName) {
-        this.context = this.createAl(p_physicalDeviceName);
-        this.DEFAULTS = new NerdAl.NerdAlDefaultObjects();
-    }
-
-    /**
      * @param p_device is the abstract, OpenAL "device" object ({@link AlDevice}
      *                 instance) to be used for making {@code alc*()} calls, and
      *                 creating an
@@ -182,6 +171,17 @@ public class NerdAl {
      */
     public NerdAl(final AlContext p_context) {
         this.createAl(p_context);
+        this.DEFAULTS = new NerdAl.NerdAlDefaultObjects();
+    }
+
+    /**
+     * Creates an abstract, OpenAL "device" object ({@link AlDevice} instance)
+     * given just the name of a physical device to connect to. Use
+     * {@link AlDevice#getPhysicalDevicesNames()} to get a list of physical
+     * devices to connect to.
+     */
+    public NerdAl(final String p_physicalDeviceName) {
+        this.context = this.createAl(p_physicalDeviceName);
         this.DEFAULTS = new NerdAl.NerdAlDefaultObjects();
     }
 
@@ -225,6 +225,11 @@ public class NerdAl {
     public NerdAl(final String p_physicalDeviceName, final AlContextSettings p_settings) {
         this.context = this.createAl(p_physicalDeviceName, p_settings);
         this.DEFAULTS = new NerdAl.NerdAlDefaultObjects();
+    }
+
+    // For `NullNerdAl`:
+    protected NerdAl(final NullNerdAl p_nullNerdAl) { // NOSONAR
+        this.DEFAULTS = new NerdAlDefaultObjects();
     }
 
     // region Initialization.
@@ -368,7 +373,7 @@ public class NerdAl {
         return this.device.getId();
     }
 
-    public String getDeviceName() {
+    public String getPhysicalDeviceName() {
         return this.device.getPhysicalDeviceName();
     }
 

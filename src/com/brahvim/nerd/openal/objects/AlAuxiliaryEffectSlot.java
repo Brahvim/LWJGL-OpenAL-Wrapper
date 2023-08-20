@@ -23,6 +23,8 @@ import com.brahvim.nerd.openal.al_ext_efx.al_effects.AlFrequencyShifter;
 import com.brahvim.nerd.openal.al_ext_efx.al_effects.AlPitchShifter;
 import com.brahvim.nerd.openal.al_ext_efx.al_effects.AlReverb;
 import com.brahvim.nerd.openal.al_ext_efx.al_effects.AlRingModulator;
+import com.brahvim.nerd.openal.null_objects.AlNullAuxiliaryEffectSlot;
+import com.brahvim.nerd.openal.null_objects.NullNerdAl;
 
 public class AlAuxiliaryEffectSlot extends AlNativeResource<Integer> {
 
@@ -118,6 +120,10 @@ public class AlAuxiliaryEffectSlot extends AlNativeResource<Integer> {
 
         this.setEffect(p_effect);
         AlAuxiliaryEffectSlot.ALL_INSTANCES.add(this);
+    }
+
+    public AlAuxiliaryEffectSlot(final AlNullAuxiliaryEffectSlot p_alNullAuxiliaryEffectSlot) {
+        super(NullNerdAl.getInstance());
     }
     // endregion
 

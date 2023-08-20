@@ -140,12 +140,4 @@ public class AlNullBuffer extends AlBuffer<Buffer> implements AlNullObject {
     protected void framelyCallback() {
     }
 
-    // @Override
-    // public NerdAl getAlMan() {
-    // return super.getAlMan();
-    // }
-    // @Override
-    // public Integer getId() {
-    // return super.getId();
-    // }
 }

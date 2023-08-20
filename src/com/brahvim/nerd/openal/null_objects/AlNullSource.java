@@ -15,7 +15,7 @@ import com.brahvim.nerd.openal.objects.NerdAl;
 public class AlNullSource extends AlSource implements AlNullObject {
 
     public AlNullSource(final NerdAl p_alMan) {
-        super(p_alMan, 0);
+        super((AlNullSource) null);
         AlSource.ALL_INSTANCES.remove(this);
     }
 

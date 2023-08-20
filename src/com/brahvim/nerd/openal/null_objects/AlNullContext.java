@@ -1,8 +1,5 @@
 package com.brahvim.nerd.openal.null_objects;
 
-import org.lwjgl.openal.ALCCapabilities;
-import org.lwjgl.openal.ALCapabilities;
-
 import com.brahvim.nerd.openal.objects.AlContext;
 import com.brahvim.nerd.openal.objects.AlDevice;
 import com.brahvim.nerd.openal.objects.NerdAl;
@@ -84,16 +81,6 @@ public class AlNullContext extends AlContext implements AlNullObject {
     }
 
     @Override
-    public ALCapabilities getLwjglAlCapabilities() {
-        return null;
-    }
-
-    @Override
-    public ALCCapabilities getLwjglAlcCapabilities() {
-        return null;
-    }
-
-    @Override
     public void setListenerFloat(final int p_alEnum, final float p_value) {
     }
 
@@ -149,12 +136,4 @@ public class AlNullContext extends AlContext implements AlNullObject {
     protected void framelyCallback() {
     }
 
-    // @Override
-    // public NerdAl getAlMan() {
-    // return super.getAlMan();
-    // }
-    // @Override
-    // public Long getId() {
-    // return super.getId();
-    // }
 }

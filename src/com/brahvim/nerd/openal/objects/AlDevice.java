@@ -139,11 +139,6 @@ public class AlDevice extends AlNativeResource<Long> {
         return this.physicalDeviceName;
     }
 
-    @Override
-    public NerdAl getAlMan() {
-        return super.MAN;
-    }
-
     // I don't want to hold a `boolean` for this...
     public boolean usesDefaultPhysicalDevice() {
         return this.physicalDeviceName.equals(AlDevice.getDefaultPhysicalDeviceName());

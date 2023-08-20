@@ -15,6 +15,7 @@ import org.lwjgl.system.MemoryStack;
 
 import com.brahvim.nerd.openal.al_buffers.AlOggBuffer;
 import com.brahvim.nerd.openal.al_buffers.AlUnknownFormatBuffer;
+import com.brahvim.nerd.openal.null_objects.AlNullSource;
 
 public class AlSource extends AlNativeResource<Integer> {
 
@@ -101,6 +102,10 @@ public class AlSource extends AlNativeResource<Integer> {
     public AlSource(final NerdAl p_alMan, final AlBuffer<?> p_buffer) {
         this(p_alMan);
         this.setBuffer(p_buffer);
+    }
+
+    protected AlSource(final AlNullSource p_alNullSource) {
+        super(null);
     }
 
     /**

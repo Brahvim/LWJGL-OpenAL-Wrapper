@@ -77,12 +77,4 @@ public class AlNullCapture extends AlCapture implements AlNullObject {
     protected void framelyCallback() {
     }
 
-    // @Override
-    // public NerdAl getAlMan() {
-    // return super.getAlMan();
-    // }
-    // @Override
-    // public Long getId() {
-    // return super.getId();
-    // }
 }

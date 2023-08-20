@@ -50,12 +50,4 @@ public class AlNullDevice extends AlDevice implements AlNullObject {
     public void setDisconnectionCallback(final Supplier<String> p_callback) {
     }
 
-    // @Override
-    // public boolean usesDefaultPhysicalDevice() {
-    // return false;
-    // }
-    // @Override
-    // public Long getId() {
-    // return super.getId();
-    // }
 }

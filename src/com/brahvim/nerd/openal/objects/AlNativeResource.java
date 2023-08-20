@@ -32,11 +32,11 @@ public abstract class AlNativeResource<IdT extends Number> /* implements Closeab
     }
     // endregion
 
-    public IdT getId() {
+    public final IdT getId() {
         return this.id;
     }
 
-    public NerdAl getAlMan() {
+    public final NerdAl getAlMan() {
         return this.MAN;
     }
 
