@@ -140,17 +140,13 @@ public abstract class AlFilter extends AlNativeResource<Integer> {
     // region Mass source attachment.
     public void attachToSources(final int p_filterType, final AlSource... p_sources) {
         if (p_filterType == EXTEfx.AL_DIRECT_FILTER) {
-            for (final AlSource s : p_sources) {
-                if (s != null) {
+            for (final AlSource s : p_sources)
+                if (s != null)
                     s.attachDirectFilter(this);
-                }
-            }
         } else {
-            for (final AlSource s : p_sources) {
-                if (s != null) {
+            for (final AlSource s : p_sources)
+                if (s != null)
                     s.attachAuxiliarySendFilter(this);
-                }
-            }
         }
     }
 
